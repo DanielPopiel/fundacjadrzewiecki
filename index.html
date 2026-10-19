@@ -44,8 +44,6 @@
   }
   #diver-poster{z-index:1;object-fit:cover;object-position:50% 42%;transition:opacity .8s ease}
   #diver-poster.off{opacity:0}
-  #dive{z-index:2;opacity:0;transition:opacity .8s ease}
-  #dive.on{opacity:1}
   #shade{ /* przyciemnianie z głębokością */
     position:absolute;inset:0;pointer-events:none;z-index:3;
     background:
@@ -270,7 +268,6 @@
     .reveal{opacity:1;transform:none;transition:none}
     .scroll-hint::after{animation:none}
     html{scroll-behavior:auto}
-    #dive{display:none}
   }
 </style>
 </head>
@@ -278,8 +275,7 @@
 
 <!-- SCENA -->
 <div id="stage" aria-hidden="true">
-  <img id="diver-poster" class="diverlayer" src="assets/nurek1-poster.jpg" alt="">
-  <canvas id="dive" class="diverlayer"></canvas>
+  <img id="diver-poster" class="diverlayer" src="assets/tlo.jpg" alt="">
   <div id="tint"></div>
   <div id="shade"></div>
   <canvas id="bubbles"></canvas>
@@ -452,7 +448,6 @@
 (function(){
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const poster = document.getElementById('diver-poster');
-  const dive = document.getElementById('dive');
   const shade = document.getElementById('shade');
   const tint  = document.getElementById('tint');
   const hint = document.getElementById('hint');
@@ -461,105 +456,7 @@
 
   let p = 0, target = 0, raf = null;
 
-  /* ------ animacja nurka jako sekwencja klatek: scroll = zanurzanie ------ */
-  const NF = 180;
-  const dctx = dive.getContext('2d', {alpha:false});
-  const frames = new Array(NF), ready = new Array(NF).fill(false);
-  let diveOn = false, lastKey = -1, cw = 0, ch = 0, parX = 0, parY = 0;
-  const frameSrc = i => 'assets/dive/f' + String(i+1).padStart(3,'0') + '.webp';
-
-  function sizeDive(){
-    // okno potrafi chwilowo raportować 0 (schowana karta/panel) — nie zerujmy wtedy canvasu
-    if (!innerWidth || !innerHeight) return false;
-    const dpr = Math.min(devicePixelRatio || 1, 2);
-    cw = dive.width  = Math.round(innerWidth  * dpr);
-    ch = dive.height = Math.round(innerHeight * dpr);
-    dive.style.width = innerWidth + 'px';
-    dive.style.height = innerHeight + 'px';
-    // ustawienie canvas.width kasuje stan kontekstu — filtr skalowania trzeba zadać tutaj
-    dctx.imageSmoothingEnabled = true;
-    dctx.imageSmoothingQuality = 'high';
-    lastKey = -1;
-    return true;
-  }
-
-  function nearestFrame(i){
-    if (ready[i]) return frames[i];
-    for (let d = 1; d < NF; d++){
-      if (i-d >= 0 && ready[i-d]) return frames[i-d];
-      if (i+d < NF && ready[i+d]) return frames[i+d];
-    }
-    return null;
-  }
-
-  // zapas 3% daje miejsce na parallaksę — dzięki temu nie skalujemy dodatkowo przez CSS
-  const OVER = 1.03, ZOOM = 0.10;
-  function paint(img, prog){
-    const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
-    const s = Math.max(cw/iw, ch/ih) * OVER * (1 + prog*ZOOM);   // kamera lekko najeżdża
-    const dw = iw*s, dh = ih*s;
-    dctx.drawImage(img, (cw-dw)/2 + parX, (ch-dh)*0.42 - prog*ch*0.05 + parY, dw, dh);
-  }
-
-  function drawDive(prog, force){
-    if (!diveOn) return;
-    if (!cw && !sizeDive()) return;   // samonaprawa, gdy canvas został wyzerowany
-    // pozycja ułamkowa między klatkami — bez zaokrąglania, żeby nie było przeskoków
-    const fpos = Math.max(0, Math.min(NF-1, prog*(NF-1)));
-    const i0 = Math.floor(fpos), i1 = Math.min(NF-1, i0+1), t = fpos - i0;
-    const key = Math.round(fpos*60);          // przerysuj już przy ~1/60 klatki różnicy
-    if (key === lastKey && !force) return;
-    const a = nearestFrame(i0);
-    if (!a) return;
-    lastKey = key;
-    dctx.fillStyle = '#03101a';
-    dctx.fillRect(0, 0, cw, ch);
-    paint(a, prog);
-    const b = (t > 0.01) ? nearestFrame(i1) : null;
-    if (b && b !== a){                        // domieszaj następną klatkę = płynne przejście
-      dctx.globalAlpha = t;
-      paint(b, prog);
-      dctx.globalAlpha = 1;
-    }
-  }
-
-  // dekodowanie do ImageBitmap: rysowanie nie blokuje wtedy głównego wątku
-  async function loadFrame(i){
-    try {
-      const r = await fetch(frameSrc(i));
-      if (!r.ok) return;
-      if (self.createImageBitmap){
-        frames[i] = await createImageBitmap(await r.blob());
-      } else {
-        const im = new Image();
-        await new Promise(res => { im.onload = im.onerror = res; im.src = frameSrc(i); });
-        if (!im.naturalWidth) return;
-        frames[i] = im;
-      }
-      ready[i] = true;
-    } catch(e){ /* pomiń klatkę */ }
-  }
-
-  async function loadDive(){
-    await loadFrame(0);
-    if (!ready[0]) return;              // brak klatek — zostaje poster
-    diveOn = true;
-    sizeDive();
-    drawDive(p, true);
-    dive.classList.add('on');
-    poster.classList.add('off');
-    let next = 1;
-    const pump = async () => {
-      while (next < NF){
-        const i = next++;
-        await loadFrame(i);
-        if (i === Math.round(p*(NF-1))) drawDive(p, true);
-      }
-    };
-    await Promise.all(Array.from({length:6}, pump));
-    drawDive(p, true);
-  }
-  if (!reduced) loadDive();
+  let parX = 0, parY = 0;
 
   /* ------ delikatna reakcja sceny na ruch myszy ------ */
   let mx = 0, my = 0, tmx = 0, tmy = 0;
@@ -584,15 +481,11 @@
     if (Math.abs(target - p) < 0.0005) p = target;
 
     if (!reduced){
-      const parMoving = Math.abs(tmx - mx) > 0.0005 || Math.abs(tmy - my) > 0.0005;
       mx += (tmx - mx) * 0.06;
       my += (tmy - my) * 0.06;
       parX = -mx * 14; parY = -my * 10;   // parallaksa rysowana wprost w canvasie
-      const fl = `brightness(${1 - p*0.55}) saturate(${1 - p*0.22})`;
-      dive.style.filter = fl;
-      poster.style.filter = fl;
-      poster.style.transform = `translate(${parX.toFixed(2)}px, ${parY.toFixed(2)}px) scale(1.04)`;
-      drawDive(p, parMoving);      // scroll przewija klatki animacji
+      poster.style.filter = `brightness(${1 - p*0.55}) saturate(${1 - p*0.22})`;
+      poster.style.transform = `translate(${parX.toFixed(2)}px, ${parY.toFixed(2)}px) scale(${(1.04 + p*0.12).toFixed(4)})`;
     }
     shade.style.opacity = Math.min(1, p * 1.25);
     tint.style.opacity = p;
@@ -609,11 +502,7 @@
     target = progress();
     if (!raf) raf = requestAnimationFrame(render);
   }
-  function onResize(){
-    if (diveOn) sizeDive();
-    drawDive(p, true);
-    onScroll();
-  }
+  function onResize(){ onScroll(); }
   addEventListener('scroll', onScroll, {passive:true});
   addEventListener('resize', onResize);
   onScroll(); render();
