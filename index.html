@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fundacja im. Stefana Drzewieckiego — Głębiny, przestworza i kosmos</title>
-<meta name="description" content="Fundacja Historii Podboju Głębin, Przestworzy i Kosmosu im. Stefana Drzewieckiego — kolekcja specjalnego umundurowania i wyposażenia lotniczego oraz sprzętu wysokościowego Wojska Polskiego z lat 1945–2000.">
+<meta name="description" content="Fundacja Historii Podboju Głębin, Przestworzy i Kosmosu im. Stefana Drzewieckiego — popularyzacja historycznego dorobku polskiej techniki podwodnej, lotniczej i kosmicznej: ubiory specjalne i urządzenia zapewniające przetrwanie człowieka.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:opsz,wght@10..72,300;10..72,500;10..72,700&family=IBM+Plex+Mono:wght@300;400;500&family=Spectral:ital,wght@0,200;0,300;0,400;1,300&display=swap" rel="stylesheet">
@@ -210,7 +210,12 @@
   }
   .fact-list b{font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:13px;color:var(--brass);min-width:58px;letter-spacing:.06em}
   .fact-list span{color:var(--paper-dim);font-size:15px}
-  .patron-portrait{margin-top:30px;max-width:300px}
+  .patron-portrait{max-width:340px;margin:8px 0 34px}
+  .patron-portrait img{width:100%;height:auto}
+  .plate.doc{margin-top:64px}
+  .plate.doc img{filter:sepia(.18) contrast(1.02)}
+  .sign{margin-top:26px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--brass)}
+  footer span:last-child{max-width:70ch;text-align:right}
 
   /* twórcy */
   .founders{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:44px}
@@ -265,6 +270,8 @@
     #readout .zone{display:none}
     section{padding:16vh calc(8vw + 46px) 12vh 8vw}
     #patron .grid{grid-template-columns:1fr;gap:30px}
+    .plate.doc{margin-top:40px}
+    footer span:last-child{text-align:left}
   }
   @media (prefers-reduced-motion:reduce){
     .reveal{opacity:1;transform:none;transition:none}
@@ -296,11 +303,9 @@
       </span>
     </div>
     <nav aria-label="Nawigacja">
-      <a href="#misja">Misja</a>
-      <a href="#kolekcja">Kolekcja</a>
-      <a href="#glebiny">Głębiny</a>
+      <a href="#fundacja">Fundacja</a>
+      <a href="#zywioly">Żywioły</a>
       <a href="#patron">Patron</a>
-      <a href="#tworcy">Twórcy</a>
       <a href="#dno">Kontakt</a>
     </nav>
   </div>
@@ -324,100 +329,64 @@
 <main>
   <section id="hero">
     <div class="inner reveal">
-      <h1><span class="thin">Fundacja Historii Podboju Głębin, Przestworzy i&nbsp;Kosmosu<br>im. Stefana Drzewieckiego</span>W&nbsp;głąb historii lotnictwa</h1>
-      <p class="lead">Każdy obrót scrolla to metr niżej — i krok dalej w przeszłość.
-      Schodzimy po zapomniane uniformy, sprzęt wysokościowy i wyposażenie polskich pilotów
-      ery odrzutowców. Wydobywamy je, opisujemy i pokazujemy — tak jak nurek wydobywa to,
-      co pochłonęła głębia.</p>
+      <h1><span class="thin">Fundacja Historii Podboju Głębin, Przestworzy i&nbsp;Kosmosu<br>im. Stefana Drzewieckiego</span>Głębiny, przestworza, kosmos</h1>
+      <p class="lead">Popularyzujemy historyczny dorobek polskiej techniki podwodnej, lotniczej
+      i&nbsp;kosmicznej — ubiory specjalne i&nbsp;urządzenia, dzięki którym człowiek przetrwał
+      tam, gdzie natura go nie przewidziała.</p>
     </div>
   </section>
 
-  <section id="misja">
+  <section id="fundacja">
     <div class="inner reveal">
-      <div class="eyebrow">Strefa I — Misja</div>
-      <h2>Ratujemy historię, <em>zanim zniknie z pamięci</em></h2>
-      <p class="lead">Poznajemy i opisujemy historię powstania oraz użytkowania ubiorów specjalnych
-      lotnictwa i urządzeń wysokościowych — ze szczególnym uwzględnieniem wyposażenia Wojska
-      Polskiego z lat 1945–2000.</p>
-      <p class="muted">Wiedzę czerpiemy z wydawnictw specjalistycznych oraz ze spotkań z personelem
-      lotniczym, technicznym i naukowym — często z ludźmi pamiętającymi czasy wczesnopowojenne.
-      Oprócz literatury udało nam się pozyskać na własność większość wyposażenia do lotów
-      używanego w lotnictwie powojennym; dziś uzupełniamy brakujące elementy tych zestawów.</p>
-      <p class="muted">Wyniki badań prezentujemy w postaci publikacji, wystaw i spotkań edukacyjnych.
-      Przygotowujemy książkę o roboczym tytule <em style="color:var(--brass);font-style:normal">„Polscy Lotnicy Wojskowi Ery Odrzutowców”</em> —
-      pierwszą tego typu pozycję na rynku.</p>
-    </div>
-  </section>
-
-  <section id="kolekcja">
-    <div class="inner reveal">
-      <div class="eyebrow">Strefa II — Era odrzutowców · 1945–1989</div>
+      <div class="eyebrow">Strefa I — Czym się zajmujemy</div>
       <div class="split">
         <div class="col-text">
-          <h2>Piloci myśliwców <em>zimnej wojny</em></h2>
-          <p class="lead">Naddźwiękowe niebo Układu Warszawskiego widziane od strony człowieka w kabinie —
-          jego ubioru, hełmu i aparatury, dzięki której przetrwał loty na granicy fizjologii.</p>
-          <div class="exhibit">
-            <div class="tag">Z kolekcji</div>
-            <div class="name">Wyposażenie pilota myśliwca</div>
-            <p>Ubiory kompensacyjne i przeciwprzeciążeniowe, hełmofony, maski i instalacje tlenowe —
-            kompletowane wraz z ustaloną historią jednostek i sprzętu.</p>
-          </div>
+          <h2>Ubiory specjalne <em>i&nbsp;sprzęt przetrwania</em></h2>
+          <p class="lead">Fundacja im. Stefana Drzewieckiego to inicjatywa mająca na celu popularyzację
+          i&nbsp;zwiększanie świadomości społecznej w&nbsp;zakresie historycznego dorobku polskiej techniki
+          podwodnej, lotniczej oraz kosmicznej. Głównym obszarem zainteresowań fundacji są ubiory specjalne
+          oraz urządzenia zapewniające przetrwanie człowieka w&nbsp;wymienionych wyżej środowiskach.</p>
+          <p class="muted">Fundacja historyczna im. Stefana Drzewieckiego to przedsięwzięcie umożliwiające
+          w&nbsp;sposób formalny realizować działalność informacyjną oraz edukacyjną w&nbsp;oparciu
+          o&nbsp;zainteresowania i&nbsp;pasję założycieli — Rafała Ducha oraz Łukasza Jaczuna.</p>
+          <p class="muted">Poprzez naszą aktywność wydawniczą, wystawienniczą chcielibyśmy uświadomić odbiorców
+          o&nbsp;wyzwaniach stojących przed odkrywcami głębin, przestworzy i&nbsp;kosmosu oraz upamiętnić
+          wysiłki konstruktorów i&nbsp;naukowców, stale przesuwających granice naszych osiągnięć technicznych.</p>
         </div>
         <div class="col-media">
           <figure class="plate">
-            <img src="assets/mig19.jpg" alt="Kpt. pil. Władysław Waltos w ubiorze wysokościowym na tle myśliwca MiG-19PM, 39. plm, lotnisko Mierzęcice, 1965">
-            <figcaption><span>Kpt. pil. W. Waltos · MiG-19PM · 39. plm Mierzęcice</span><b>1965</b></figcaption>
+            <img src="assets/piloci.jpg" width="1000" height="1500" loading="lazy" alt="Dwóch mężczyzn w historycznym umundurowaniu lotniczym idzie płytą lotniska — jeden w ubiorze wysokościowym z wężem tlenowym, drugi w skórzanej kurtce i czapce oficerskiej">
+            <figcaption><span>Na zdjęciu: Mikołaj Żukowski i&nbsp;Tytus Chaładus</span><b>Fot. FoxTwo.pl</b></figcaption>
           </figure>
         </div>
       </div>
+      <figure class="plate doc">
+        <img src="assets/tabela.jpg" width="1181" height="483" loading="lazy" alt="Maszynopis: Tabela 3 — ciśnienie atmosferyczne i cząstkowe ciśnienie tlenu na wysokościach od 0 do 20 000 m">
+        <figcaption><span>Z archiwum · ciśnienie atmosferyczne i&nbsp;cząstkowe tlenu do 20&nbsp;000&nbsp;m</span><b>Tabela 3</b></figcaption>
+      </figure>
     </div>
   </section>
 
-  <section id="ekwipunek">
+  <section id="zywioly">
     <div class="inner reveal">
-      <div class="eyebrow">Strefa III — Ubiór i wyposażenie · 1945–2000</div>
+      <div class="eyebrow">Strefa II — Trzy żywioły, jeden patron</div>
       <div class="split rev">
         <div class="col-text">
-          <h2>Rzeczy, które nosił <em>człowiek w powietrzu</em></h2>
-          <p class="lead">Skórzane hełmofony, kombinezony, uprzęże spadochronowe, gogle i maski —
-          przedmioty codziennego użytku ludzi latających tam, gdzie technika dopiero uczyła się
-          chronić życie.</p>
-          <p class="muted">Każdy obiekt dokumentujemy i opisujemy: skąd pochodzi, do czego służył i jak
-          był używany. Zestawiając relacje świadków z literaturą, potrafimy odtworzyć pełny kontekst
-          — jednostkę, epokę i człowieka.</p>
+          <h2>Głębiny i&nbsp;niebo <em>w&nbsp;jednej historii</em></h2>
+          <p class="lead">W kontekście polskiej techniki, na szczególne zwrócenie uwagi zasługuje ścisła
+          współpraca ośrodków badawczych zajmujących się zagadnieniami lotniczo-kosmicznymi oraz techniką
+          podwodną.</p>
+          <p class="muted">Stąd też pomysł na przedstawienie tych tematów razem i&nbsp;wybór patrona naszej
+          fundacji — badacza, wynalazcy w&nbsp;tych trzech dziedzinach.</p>
+          <p class="muted">Mamy nadzieję, że nasze działania zainspirują kolejne pokolenia do dalszego
+          rozwijania cywilizacji technicznej, umożliwiającej kontynuację największej przygody ludzkości —
+          odkrywania nowych światów.</p>
+          <p class="sign">Rafał Duch · Łukasz Jaczun</p>
         </div>
         <div class="col-media">
           <figure class="plate">
-            <img src="assets/pilot1961.jpg" alt="Portret pilota w skórzanym hełmofonie i uprzęży spadochronowej, początek lat 60. XX w.">
-            <figcaption><span>Pilot w hełmofonie i uprzęży spadochronowej</span><b>ok. 1961</b></figcaption>
-          </figure>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="glebiny">
-    <div class="inner reveal">
-      <div class="eyebrow">Strefa IV — Głębiny · gdzie lotnictwo spotyka wodę</div>
-      <div class="split">
-        <div class="col-text">
-          <h2>Ten sam oddech, <em>inny żywioł</em></h2>
-          <p class="lead">W polskim kontekście technika morska, lotnicza i kosmiczna — jeśli chodzi
-          o osprzęt i ubiór specjalny — są ze sobą ściśle powiązane.</p>
-          <p class="muted">Warszawskie instytuty — Lotnictwa, Techniczny Wojsk Lotniczych, Wojskowej
-          Medycyny Lotniczej — oraz gdyńska Katedra Prac Podwodnych współpracowały przy opracowaniach
-          sprzętu. Wiedza o gumach z lotniczych kamizelek ratunkowych i komór naciągowych ubiorów
-          kompensacyjnych posłużyła do budowy ubiorów dla nurków; lotnicze urządzenia tlenowe trafiały
-          do komór ciśnień, a poniemiecki inhalator Dräger stał się pierwowzorem polskiego aparatu
-          nurkowego o obiegu zamkniętym.</p>
-          <p class="muted">Dlatego naszym patronem jest Stefan Drzewiecki — a w głąb historii lotnictwa
-          schodzi u nas nurek.</p>
-        </div>
-        <div class="col-media">
-          <figure class="plate">
-            <img src="assets/nurkowie.jpg" alt="Płetwonurkowie w historycznym sprzęcie nurkowym o obiegu zamkniętym, o zmierzchu nad wodą">
-            <figcaption><span>Ubiór i aparaty nurkowe — rekonstrukcja</span><b>Kolekcja</b></figcaption>
+            <img src="assets/nurkowie.jpg" width="1000" height="1333" loading="lazy" alt="Dwóch nurków w historycznym sprzęcie nurkowym stoi na nabrzeżu o zachodzie słońca">
+            <figcaption><span>Nurkowie w&nbsp;historycznym sprzęcie</span><b>Kolekcja</b></figcaption>
           </figure>
         </div>
       </div>
@@ -426,56 +395,36 @@
 
   <section id="patron">
     <div class="inner reveal">
-      <div class="eyebrow">Strefa V — Patron · 1844–1938</div>
+      <div class="eyebrow">Strefa III — Patron · 1844–1938</div>
       <div class="grid">
         <div>
           <h2>Stefan <em>Drzewiecki</em></h2>
-          <p class="lead">Polski wynalazca i inżynier przełomu XIX i XX wieku, którego osiągnięcia
-          wyprzedzały epokę. Łączył dwa żywioły, między którymi porusza się ta strona — głębinę i niebo.</p>
-          <p class="muted">Największą sławę przyniosły mu okręty podwodne: już w latach 70. XIX wieku
-          budował łodzie napędzane siłą ludzkich mięśni, a w 1884 r. zaprezentował pierwszy na świecie
-          okręt podwodny o napędzie elektrycznym. Równolegle prowadził pionierskie prace nad aerodynamiką
-          i opracował teorię śmigła, która przez lata stanowiła podstawę projektowania napędów lotniczych.</p>
-          <img class="patron-portrait plate" src="assets/drzewiecki.jpg" alt="Stefan Drzewiecki, portret archiwalny">
+          <p class="lead">Patron fundacji to działacz towarzystw naukowych Francji, Rosji i&nbsp;Polski,
+          należący do grona najwybitniejszych inżynierów polskich XIX wieku, pionier żeglugi podwodnej,
+          techniki lotniczej. W&nbsp;historii zapisał się jako wynalazca łączący rozważania teoretyczne
+          z&nbsp;eksperymentem.</p>
+          <p class="muted">Do jego bogatego dorobku zalicza się m.in. skonstruowanie pierwszych okrętów
+          podwodnych o&nbsp;napędzie strugowodnym oraz o&nbsp;zasilaniu elektrycznym z&nbsp;akumulatorów;
+          samolotu samostatecznego, opracowanie ogólnej teorii śruby okrętowej oraz śmigła lotniczego —
+          w&nbsp;tym uzyskanie patentów na śmigła o&nbsp;łopatach nastawnych i&nbsp;samonastawnych.</p>
+          <p class="muted">W wolnej Polsce należał do grupy założycielskiej Warszawskiej Akademii Nauk
+          Technicznych. W&nbsp;1928 roku za uchwałą Ligi Obrony Powietrznej i&nbsp;Przeciwgazowej Państwa
+          otrzymał tytuł jej honorowego członka.</p>
+          <p class="muted">Uważający się za Polaka i&nbsp;zawsze manifestujący swą polskość Stefan Drzewiecki
+          zapisał Polsce w&nbsp;spadku cały swój dorobek naukowy. Niestety, zbiory pozostawione przez niego
+          zostały najprawdopodobniej zniszczone w&nbsp;wyniku działań wojennych kampanii wrześniowej.</p>
         </div>
-        <div class="fact-list">
-          <div><b>1844</b><span>urodzony na Podolu</span></div>
-          <div><b>1877</b><span>łodzie podwodne napędzane siłą ludzkich mięśni</span></div>
-          <div><b>1884</b><span>pierwszy okręt podwodny z napędem elektrycznym</span></div>
-          <div><b>1892</b><span>teoria śmigła — podstawa obliczeń napędów lotniczych</span></div>
-          <div><b>1938</b><span>umiera, zostawiając dziesiątki patentów i publikacji</span></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="tworcy">
-    <div class="inner reveal">
-      <div class="eyebrow">Strefa VI — Twórcy fundacji</div>
-      <h2>Dwa żywioły, <em>dwie pasje</em></h2>
-      <p class="lead">Fundację historyczną im. Stefana Drzewieckiego założyliśmy w 2024 roku — z pasji
-      do historii ubiorów i wyposażenia specjalnego. Sami poruszamy się w obu żywiołach patrona:
-      w powietrzu i pod wodą.</p>
-      <div class="founders">
-        <div class="founder">
-          <figure class="plate">
-            <img src="assets/rafal.jpg" alt="Rafał Duch na płycie lotniska pod skrzydłem samolotu, o zachodzie słońca">
+        <div>
+          <figure class="plate patron-portrait">
+            <img src="assets/drzewiecki.jpg" width="760" height="994" loading="lazy" alt="Stefan Drzewiecki, portret archiwalny">
+            <figcaption><span>Stefan Drzewiecki</span><b>1844–1938</b></figcaption>
           </figure>
-          <div class="role">Prezes Fundacji · żywioł powietrza</div>
-          <div class="fname">Rafał Duch</div>
-          <p>Współzałożyciel fundacji, na co dzień związany z lotnictwem. Odpowiada za wątek lotniczy
-          kolekcji i kontakt z jednostkami przechowującymi historyczne maszyny.</p>
-          <a href="tel:+48517019609">+48 517 019 609</a>
-        </div>
-        <div class="founder">
-          <figure class="plate">
-            <img src="assets/lukasz.jpg" alt="Łukasz Jaczun w pełnym sprzęcie nurkowym z hełmem, na trapie statku">
-          </figure>
-          <div class="role">Współzałożyciel · żywioł wody</div>
-          <div class="fname">Łukasz Jaczun</div>
-          <p>Współzałożyciel fundacji i nurek zawodowy. Autor pierwszej książki o przedwojennym
-          ubiorze lotniczym; odpowiada za wątek podwodny i badania nad sprzętem specjalnym.</p>
-          <a href="tel:+48603985166">+48 603 985 166</a>
+          <div class="fact-list">
+            <div><b>Woda</b><span>pierwsze okręty podwodne o&nbsp;napędzie strugowodnym i&nbsp;elektrycznym z&nbsp;akumulatorów</span></div>
+            <div><b>Niebo</b><span>samolot samostateczny; patenty na śmigła o&nbsp;łopatach nastawnych i&nbsp;samonastawnych</span></div>
+            <div><b>Teoria</b><span>ogólna teoria śruby okrętowej i&nbsp;śmigła lotniczego</span></div>
+            <div><b>1928</b><span>honorowy członek Ligi Obrony Powietrznej i&nbsp;Przeciwgazowej Państwa</span></div>
+          </div>
         </div>
       </div>
     </div>
@@ -483,20 +432,18 @@
 
   <section id="dno">
     <div class="inner reveal">
-      <div class="eyebrow">Dno — 3000 m</div>
+      <div class="eyebrow">Dno — Kontakt</div>
       <h2>Zejdź z&nbsp;nami <em>głębiej</em></h2>
-      <p class="lead">Kolekcję udostępniamy podczas umawianych pokazów oraz wystaw czasowych.
-      Współpracujemy z muzeami, jednostkami wojskowymi, szkołami i kolekcjonerami — i chętnie
-      rozmawiamy z osobami, które pamiętają opisywane czasy.</p>
-      <a class="cta" href="mailto:rafal.duch.genres@gmail.com?subject=Kontakt%20—%20Fundacja%20im.%20Stefana%20Drzewieckiego">Napisz do nas</a>
+      <p class="lead">Fundacja Historii Podboju Głębin, Przestworzy i&nbsp;Kosmosu im.&nbsp;Stefana Drzewieckiego.</p>
+      <a class="cta" href="mailto:duch.rafal@fundacjadrzewiecki.pl?subject=Kontakt%20—%20Fundacja%20im.%20Stefana%20Drzewieckiego">Napisz do nas</a>
       <div class="contact-row">
-        <span><span class="k">Prezes · żywioł powietrza</span>Rafał Duch<br><a href="tel:+48517019609">+48 517 019 609</a></span>
-        <span><span class="k">Współzałożyciel · żywioł wody</span>Łukasz Jaczun<br><a href="tel:+48603985166">+48 603 985 166</a></span>
-        <span><span class="k">E-mail</span><a href="mailto:rafal.duch.genres@gmail.com">rafal.duch.genres@gmail.com</a></span>
+        <span><span class="k">Prezes fundacji</span>Rafał Duch<br><a href="tel:+48517019609">+48 517 019 609</a></span>
+        <span><span class="k">E-mail</span><a href="mailto:duch.rafal@fundacjadrzewiecki.pl">duch.rafal@fundacjadrzewiecki.pl</a></span>
+        <span><span class="k">Media społecznościowe</span><a href="https://www.instagram.com/fundacjadrzewiecki" target="_blank" rel="noopener">Instagram</a><br><a href="https://www.facebook.com/profile.php?id=61572645143188" target="_blank" rel="noopener">Facebook</a></span>
       </div>
       <div class="reg">
         <span>KRS 0001152807</span>
-        <span>REGON 540783159</span>
+        <span>REGON 54078315900000</span>
         <span>NIP 6040256714</span>
       </div>
     </div>
@@ -504,8 +451,8 @@
 </main>
 
 <footer>
-  <span>© 2026 Fundacja im. Stefana Drzewieckiego · Rafał Duch · Łukasz Jaczun</span>
-  <span>Historia podboju głębin, przestworzy i kosmosu</span>
+  <span>© 2026 Fundacja im. Stefana Drzewieckiego</span>
+  <span>Zdjęcia pilotów: FoxTwo.pl — Michał Wajnchold, Leszek Kujawski, Przemek Szynkora · Statyści: Mikołaj Żukowski, Tytus Chaładus</span>
 </footer>
 
 <script>
@@ -524,12 +471,10 @@
   const MAX_M = 3000, Y_START = 2026, Y_END = 1844;
   const zones = [
     [0.00,'Powierzchnia — współczesność'],
-    [0.15,'Strefa I — misja fundacji'],
-    [0.30,'Strefa II — era odrzutowców'],
-    [0.46,'Strefa III — ubiór pilota'],
-    [0.62,'Strefa IV — głębiny'],
-    [0.78,'Strefa V — patron'],
-    [0.90,'Strefa VI — twórcy']
+    [0.14,'Strefa I — czym się zajmujemy'],
+    [0.40,'Strefa II — trzy żywioły'],
+    [0.62,'Strefa III — patron'],
+    [0.88,'Dno — kontakt']
   ];
 
   let p = 0, target = 0, raf = null;
