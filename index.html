@@ -7,7 +7,7 @@
 <meta name="description" content="Fundacja Historii Podboju Głębin, Przestworzy i Kosmosu im. Stefana Drzewieckiego — popularyzacja historycznego dorobku polskiej techniki podwodnej, lotniczej i kosmicznej: ubiory specjalne i urządzenia zapewniające przetrwanie człowieka.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:opsz,wght@10..72,300;10..72,500;10..72,700&family=Courier+Prime:wght@400;700&family=IBM+Plex+Mono:wght@300;400;500&family=Spectral:ital,wght@0,200;0,300;0,400;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:opsz,wght@10..72,300;10..72,500;10..72,700&family=IBM+Plex+Mono:wght@300;400;500&family=Spectral:ital,wght@0,200;0,300;0,400;1,300&display=swap" rel="stylesheet">
 <style>
   :root{
     --abyss-0:#0b2530;      /* woda przy powierzchni */
@@ -211,6 +211,8 @@
   .fact-list span{color:var(--paper-dim);font-size:15px}
   .patron-portrait{max-width:340px;margin:8px 0 34px}
   .patron-portrait img{width:100%;height:auto}
+  .plate.doc{margin-top:56px;max-width:560px;opacity:.85}
+  .plate.doc img{width:100%;height:auto;filter:sepia(.18) contrast(1.02)}
   .sign{margin-top:26px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--brass)}
   footer span:last-child{max-width:70ch;text-align:right}
 
@@ -252,48 +254,6 @@
     display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
   }
 
-  /* przestworza: tabela wysokości */
-  section#wysokosc{display:block;min-height:0;padding:0}
-  .alt-track{height:280vh;position:relative}
-  .alt-sticky{position:sticky;top:0;height:100vh;display:flex;align-items:center;padding:0 7vw}
-  .alt-grid{max-width:1040px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
-  .alt-big{font-family:'Big Shoulders',sans-serif;font-weight:700;font-size:clamp(64px,8.6vw,132px);line-height:.9;letter-spacing:.01em;font-variant-numeric:tabular-nums;margin-top:-4px}
-  .alt-big small{font-family:'IBM Plex Mono',monospace;font-weight:300;font-size:13px;letter-spacing:.2em;color:var(--cyan);margin-left:14px;text-transform:uppercase}
-  .alt-rows{margin-top:26px;border-top:1px solid var(--hud-line);font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--cyan-dim);letter-spacing:.06em}
-  .alt-rows div{display:flex;align-items:baseline;gap:10px;padding:12px 0;border-bottom:1px solid var(--hud-line)}
-  .alt-rows .k{flex:1;font-size:10px;letter-spacing:.22em;text-transform:uppercase}
-  .alt-rows b{font-weight:400;font-size:20px;color:var(--paper);font-variant-numeric:tabular-nums}
-  .o2{height:4px;background:var(--hud-line);margin-top:22px;position:relative}
-  .o2 i{position:absolute;left:0;top:0;bottom:0;width:100%;background:linear-gradient(90deg,var(--brass-dim),var(--brass));transform-origin:left;will-change:transform}
-  .alt-note{font-size:15px}
-  .alt-doc{position:relative}
-  .scan{position:absolute;width:78%;height:auto;right:2%;top:-15%;transform:rotate(4deg);opacity:.5;filter:sepia(.3) brightness(.8);box-shadow:0 20px 50px rgba(0,0,0,.5)}
-  .paper{position:relative;background:#ece2c8;color:#2b2519;font-family:'Courier Prime','Courier New',monospace;
-    padding:26px 28px 20px;transform:rotate(-1.2deg);box-shadow:0 30px 70px rgba(0,0,0,.55),0 0 0 1px rgba(0,0,0,.08) inset;
-    background-image:radial-gradient(120% 80% at 30% 20%,rgba(255,255,255,.35),transparent 60%),radial-gradient(90% 70% at 90% 100%,rgba(120,90,40,.18),transparent 70%)}
-  .ph{text-align:right;font-size:17px;margin-bottom:10px}
-  .tr{display:grid;grid-template-columns:.8fr 1.1fr 1.1fr;gap:12px;padding:5px 8px;font-size:15px;font-variant-numeric:tabular-nums;transition:background .35s,color .35s}
-  .tr span:not(:first-child){text-align:right}
-  .tr.th{font-size:11px;line-height:1.25;border-top:2px dashed rgba(43,37,25,.55);border-bottom:2px dashed rgba(43,37,25,.55);padding:10px 8px;margin-bottom:6px}
-  .tr.th span{text-align:left!important}
-  .tr.on{background:rgba(201,162,75,.55);color:#120e06}
-  .tr.past{color:rgba(43,37,25,.38)}
-  .pf{border-top:2px dashed rgba(43,37,25,.55);margin-top:8px;padding-top:10px;font-size:11px;color:rgba(43,37,25,.65)}
-  @media (max-width:820px){
-    .alt-sticky{padding:0 calc(8vw + 46px) 0 8vw;align-items:flex-start;padding-top:100px}
-    .alt-grid{grid-template-columns:1fr;gap:18px}
-    #wysokosc h2{font-size:26px;margin-bottom:4px}
-    #wysokosc .eyebrow{margin-bottom:10px}
-    .alt-big{font-size:48px}
-    .alt-rows{margin-top:10px;font-size:11px}.alt-rows div{padding:6px 0}.alt-rows b{font-size:15px}
-    .alt-note,.scan{display:none}
-    .o2{margin-top:10px}
-    .paper{padding:12px 12px 10px;transform:rotate(-.6deg)}
-    .ph{font-size:13px;margin-bottom:4px}
-    .tr{font-size:12px;padding:2px 6px;gap:8px}
-    .tr.th{font-size:9px;padding:6px}
-    .pf{font-size:9px}
-  }
 
   @media (max-width:900px){
     .split,.split.rev{grid-template-columns:1fr;gap:34px}
@@ -402,35 +362,6 @@
     </div>
   </section>
 
-  <section id="wysokosc" aria-labelledby="alt-h">
-    <div class="alt-track">
-      <div class="alt-sticky">
-        <div class="alt-grid reveal">
-          <div class="alt-read">
-            <div class="eyebrow">Przestworza — w górę zamiast w głąb</div>
-            <h2 id="alt-h">Im wyżej, <em>tym mniej tlenu</em></h2>
-            <div class="alt-big"><span id="altV">0</span><small>m n.p.m.</small></div>
-            <div class="alt-rows">
-              <div><span class="k">Ciśnienie atmosferyczne</span><b id="altP">760,0</b> mm Hg</div>
-              <div><span class="k">Ciśnienie cząstkowe tlenu</span><b id="altO">159,0</b> mm Hg</div>
-            </div>
-            <div class="o2" aria-hidden="true"><i id="altBar"></i></div>
-            <p class="muted alt-note">Na 20&nbsp;000&nbsp;m tlenu jest blisko 18 razy mniej niż na ziemi.
-            Dlatego pilot wysokościowy nie poleci bez ubioru specjalnego i&nbsp;aparatury tlenowej.</p>
-          </div>
-          <div class="alt-doc">
-            <img class="scan" src="assets/tabela.jpg" width="1181" height="483" loading="lazy" alt="Oryginał maszynopisu: Tabela 3">
-            <div class="paper">
-              <div class="ph">Tabela 3</div>
-              <div class="tr th"><span>Wysokość<br>w m</span><span>Ciśnienie atmo&shy;sferyczne w mm Hg</span><span>Ciśnienie cząst&shy;kowe tlenu /O<sub>2</sub>/ w mm Hg</span></div>
-              <div id="altTable"></div>
-              <div class="pf">Z archiwum fundacji · przepisano z maszynopisu</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <section id="zywioly">
     <div class="inner reveal">
@@ -511,6 +442,10 @@
         <span>REGON 54078315900000</span>
         <span>NIP 6040256714</span>
       </div>
+      <figure class="plate doc">
+        <img src="assets/tabela.jpg" width="1181" height="483" loading="lazy" alt="Maszynopis: Tabela 3 — ciśnienie atmosferyczne i cząstkowe ciśnienie tlenu na wysokościach od 0 do 20 000 m">
+        <figcaption><span>Z archiwum · ciśnienie atmosferyczne i&nbsp;cząstkowe tlenu do 20&nbsp;000&nbsp;m</span><b>Tabela 3</b></figcaption>
+      </figure>
     </div>
   </section>
 </main>
@@ -537,9 +472,8 @@
   const zones = [
     [0.00,'Powierzchnia — współczesność'],
     [0.14,'Strefa I — czym się zajmujemy'],
-    [0.28,'Przestworza — w górę'],
-    [0.52,'Strefa II — trzy żywioły'],
-    [0.70,'Strefa III — patron'],
+    [0.40,'Strefa II — trzy żywioły'],
+    [0.62,'Strefa III — patron'],
     [0.88,'Dno — kontakt']
   ];
 
@@ -751,37 +685,6 @@
     })();
   }
 
-  /* ------ tabela wysokości: scroll = wznoszenie ------ */
-  (function(){
-    const T = [[0,760,159],[1000,674.1,141.5],[2000,596.2,125.2],[3000,525.8,110.4],[4000,462.2,97.1],
-      [7000,307.8,64.5],[9000,230.4,48.4],[12000,144.9,30.4],[15100,90.3,18.8],[18000,56.2,11.8],
-      [19000,47.9,10.0],[20000,41.0,8.6]];
-    const fmt = (v,d) => v.toLocaleString('pl-PL',{minimumFractionDigits:d,maximumFractionDigits:d});
-    const tb = document.getElementById('altTable');
-    const rows = T.map(r => { const d=document.createElement('div'); d.className='tr';
-      d.innerHTML = `<span>${r[0]}</span><span>${fmt(r[1],1)}</span><span>${fmt(r[2],1)}</span>`; tb.appendChild(d); return d; });
-    const track = document.querySelector('.alt-track');
-    const vEl = document.getElementById('altV'), pEl = document.getElementById('altP'),
-          oEl = document.getElementById('altO'), bar = document.getElementById('altBar');
-    let last = -1;
-    function upd(){
-      const r = track.getBoundingClientRect();
-      const span = r.height - innerHeight;
-      const t = Math.min(1, Math.max(0, -r.top / (span || 1)));
-      const alt = Math.round(t * 2000) * 10;
-      if (Math.abs(alt - last) < 1) return; last = alt;
-      let i = 0; while (i < T.length-1 && T[i+1][0] <= alt) i++;
-      const a = T[i], b = T[Math.min(i+1, T.length-1)];
-      const f = b[0] > a[0] ? (alt - a[0]) / (b[0] - a[0]) : 0;
-      const P = a[1] + (b[1]-a[1])*f, O = a[2] + (b[2]-a[2])*f;
-      vEl.textContent = fmt(Math.round(alt/10)*10, 0);
-      pEl.textContent = fmt(P,1); oEl.textContent = fmt(O,1);
-      bar.style.transform = `scaleX(${(O/159).toFixed(4)})`;
-      rows.forEach((el,k) => { el.classList.toggle('on', k===i); el.classList.toggle('past', k<i); });
-    }
-    addEventListener('scroll', () => requestAnimationFrame(upd), {passive:true});
-    addEventListener('resize', upd); upd();
-  })();
 
   /* ------ reveal sekcji ------ */
   const io = new IntersectionObserver(es=>{
