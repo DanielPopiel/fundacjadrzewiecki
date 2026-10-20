@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fundacja im. Stefana Drzewieckiego — Głębiny, przestworza i kosmos</title>
 <meta name="description" content="Fundacja Historii Podboju Głębin, Przestworzy i Kosmosu im. Stefana Drzewieckiego — popularyzacja historycznego dorobku polskiej techniki podwodnej, lotniczej i kosmicznej: ubiory specjalne i urządzenia zapewniające przetrwanie człowieka.">
+<link rel="icon" href="assets/logo-brass.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:opsz,wght@10..72,300;10..72,500;10..72,700&family=IBM+Plex+Mono:wght@300;400;500&family=Spectral:ital,wght@0,200;0,300;0,400;1,300&display=swap" rel="stylesheet">
@@ -44,6 +45,8 @@
   }
   #diver-poster{z-index:1;object-fit:cover;object-position:50% 42%;transition:opacity .8s ease}
   #diver-poster.off{opacity:0}
+  #water{z-index:2;opacity:0;transition:opacity .8s ease}
+  #water.on{opacity:1}
   #shade{ /* przyciemnianie z głębokością */
     position:absolute;inset:0;pointer-events:none;z-index:3;
     background:
@@ -71,18 +74,18 @@
     display:flex;justify-content:space-between;align-items:center;
     padding:12px 28px;
     font-size:11px;letter-spacing:.18em;text-transform:uppercase;
-    background:linear-gradient(180deg,rgba(3,16,26,.72),rgba(3,16,26,.5));
-    border-bottom:1px solid rgba(143,216,228,.12);
+    background:linear-gradient(180deg,rgba(3,16,26,.42),rgba(3,16,26,.18));
+    border-bottom:1px solid rgba(143,216,228,.06);
     transition:background .4s ease,padding .4s ease;
   }
   /* mosiężna nitka pod paskiem — wygasa ku krawędziom */
   .hud-top::after{
     content:'';position:absolute;left:0;right:0;bottom:-1px;height:1px;pointer-events:none;
     background:linear-gradient(90deg,transparent 0%,rgba(201,162,75,.0) 8%,rgba(201,162,75,.55) 50%,rgba(201,162,75,0) 92%,transparent 100%);
-    opacity:.6;transition:opacity .4s ease;
+    opacity:.3;transition:opacity .4s ease;
   }
-  #hud.scrolled .hud-top{background:linear-gradient(180deg,rgba(3,16,26,.9),rgba(3,16,26,.8));padding:9px 28px}
-  #hud.scrolled .hud-top::after{opacity:1}
+  #hud.scrolled .hud-top{background:linear-gradient(180deg,rgba(3,16,26,.7),rgba(3,16,26,.55));padding:9px 28px}
+  #hud.scrolled .hud-top::after{opacity:.6}
   .hud-top .brand{display:flex;align-items:center;gap:14px}
   .hud-top .brand img{width:42px;height:42px;opacity:.95;flex:none;transition:width .4s,height .4s}
   #hud.scrolled .hud-top .brand img{width:36px;height:36px}
@@ -287,7 +290,10 @@
     .hud-top{padding:10px 16px}
     #hud.scrolled .hud-top{padding:8px 16px}
     .hud-top .brand .txt small{display:none}
-    section{padding:16vh 8vw 12vh}
+    section{padding:12vh 8vw 8vh;min-height:0}
+    #hero{min-height:100svh}
+    footer{flex-direction:column;align-items:center;text-align:center}
+    footer span:last-child{text-align:center}
     #patron .grid{grid-template-columns:1fr;gap:30px}
     footer span:last-child{text-align:left}
   }
@@ -303,6 +309,7 @@
 <!-- SCENA -->
 <div id="stage" aria-hidden="true">
   <img id="diver-poster" class="diverlayer" src="assets/tlo.jpg?v=2" alt="">
+  <canvas id="water" class="diverlayer"></canvas>
   <div id="tint"></div>
   <div id="shade"></div>
   <canvas id="bubbles"></canvas>
@@ -463,6 +470,7 @@
 (function(){
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const poster = document.getElementById('diver-poster');
+  const water = document.getElementById('water');
   const shade = document.getElementById('shade');
   const tint  = document.getElementById('tint');
   const hint = document.getElementById('hint');
@@ -499,7 +507,8 @@
       mx += (tmx - mx) * 0.06;
       my += (tmy - my) * 0.06;
       parX = -mx * 14; parY = -my * 10;   // parallaksa rysowana wprost w canvasie
-      poster.style.filter = `brightness(${1 - p*0.55}) saturate(${1 - p*0.22})`;
+      const fl = `brightness(${1 - p*0.55}) saturate(${1 - p*0.22})`;
+      poster.style.filter = fl; water.style.filter = fl;
       poster.style.transform = `translate(${parX.toFixed(2)}px, ${parY.toFixed(2)}px) scale(${(1.04 + p*0.12).toFixed(4)})`;
     }
     shade.style.opacity = Math.min(1, p * 1.25);
@@ -512,6 +521,94 @@
     if (moving) raf = requestAnimationFrame(render);
     else raf = null;
   }
+
+
+  /* ------ woda: tło w WebGL, falowanie i kręgi pod kursorem ------ */
+  const W2 = { on:false, mx:-9999, my:-9999, glow:0, tglow:0, rips:new Float32Array(40), ri:0, lx:0, ly:0, lt:0 };
+  window.__W2 = W2;
+  (function initWater(){
+    if (reduced) return;
+    const gl = water.getContext('webgl', {premultipliedAlpha:false, antialias:false});
+    if (!gl) return;
+    const vs = 'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
+    const fs = `precision mediump float;
+uniform sampler2D t;uniform vec2 res;uniform vec2 img;uniform float time;uniform float dpr;
+uniform float sc;uniform vec2 par;uniform vec2 mouse;uniform float glow;uniform vec4 rip[10];
+void main(){
+  vec2 px=gl_FragCoord.xy/dpr; px.y=res.y-px.y;
+  vec2 off=vec2(sin(px.y*.011+time*.8)+.6*sin(px.x*.017-time*.55), cos(px.x*.009+time*.65)+.6*cos(px.y*.015+time*.5))*1.3;
+  for(int i=0;i<10;i++){
+    vec4 r=rip[i]; float age=time-r.z;
+    if(age>0. && age<3.){
+      vec2 d=px-r.xy; float dist=length(d)+.001;
+      float ring=exp(-abs(dist-age*170.)/38.)*exp(-age*1.5);
+      off+=d/dist*sin(dist*.07-age*9.)*ring*r.w*9.;
+    }
+  }
+  float md=length(px-mouse);
+  off+=(px-mouse)/(md+.001)*sin(md*.05-time*3.)*exp(-md/140.)*glow*3.;
+  vec2 q=(px+off-par-res*.5)/sc+res*.5;
+  float s=max(res.x/img.x,res.y/img.y); vec2 dz=img*s; vec2 o=(res-dz)*vec2(.5,.42);
+  vec3 c=texture2D(t,clamp((q-o)/dz,.001,.999)).rgb;
+  c+=vec3(.03,.09,.1)*exp(-md/240.)*glow;
+  gl_FragColor=vec4(c,1.);
+}`;
+    function sh(type, src){ const o=gl.createShader(type); gl.shaderSource(o,src); gl.compileShader(o);
+      if(!gl.getShaderParameter(o,gl.COMPILE_STATUS)) throw gl.getShaderInfoLog(o); return o; }
+    let prog;
+    try { prog=gl.createProgram(); gl.attachShader(prog,sh(gl.VERTEX_SHADER,vs)); gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,fs)); gl.linkProgram(prog); }
+    catch(e){ return; }
+    gl.useProgram(prog);
+    const buf=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+    const la=gl.getAttribLocation(prog,'a'); gl.enableVertexAttribArray(la); gl.vertexAttribPointer(la,2,gl.FLOAT,false,0,0);
+    const U={}; ['t','res','img','time','dpr','sc','par','mouse','glow','rip'].forEach(n=>U[n]=gl.getUniformLocation(prog,n));
+    const tex=gl.createTexture();
+    function start(){
+      gl.bindTexture(gl.TEXTURE_2D,tex);
+      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+      try { gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,poster); } catch(e){ return; }
+      gl.uniform1i(U.t,0); gl.uniform2f(U.img,poster.naturalWidth,poster.naturalHeight);
+      W2.on=true; sizeW(); water.classList.add('on'); poster.classList.add('off');
+      requestAnimationFrame(frame);
+    }
+    let dpr=1;
+    function sizeW(){ if(!innerWidth||!innerHeight) return;
+      dpr=Math.min(devicePixelRatio||1, innerWidth<700 ? 1.5 : 1.25);
+      water.width=Math.round(innerWidth*dpr); water.height=Math.round(innerHeight*dpr);
+      water.style.width=innerWidth+'px'; water.style.height=innerHeight+'px';
+      gl.viewport(0,0,water.width,water.height); }
+    addEventListener('resize',sizeW);
+    const t0=performance.now();
+    function frame(now){
+      const tm=(now-t0)/1000;
+      W2.glow+=(W2.tglow-W2.glow)*.06; W2.tglow*=.985;
+      gl.uniform2f(U.res,innerWidth,innerHeight); gl.uniform1f(U.time,tm); gl.uniform1f(U.dpr,dpr);
+      gl.uniform1f(U.sc,1.04+p*.12); gl.uniform2f(U.par,parX,parY);
+      gl.uniform2f(U.mouse,W2.mx,W2.my); gl.uniform1f(U.glow,W2.glow);
+      gl.uniform4fv(U.rip,W2.rips);
+      gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+      W2.time=tm;
+      requestAnimationFrame(frame);
+    }
+    if (poster.complete && poster.naturalWidth) start(); else poster.addEventListener('load',start,{once:true});
+  })();
+  function ripple(x,y,str){
+    if(!W2.on) return;
+    const i=W2.ri*4; W2.rips[i]=x; W2.rips[i+1]=y; W2.rips[i+2]=W2.time||0; W2.rips[i+3]=str;
+    W2.ri=(W2.ri+1)%10;
+  }
+  addEventListener('pointermove', e=>{
+    W2.mx=e.clientX; W2.my=e.clientY; W2.tglow=1;
+    const now=performance.now(), d=Math.hypot(e.clientX-W2.lx,e.clientY-W2.ly);
+    if (d>46 && now-W2.lt>70){ ripple(e.clientX,e.clientY,Math.min(1,.35+d/160)); W2.lx=e.clientX; W2.ly=e.clientY; W2.lt=now;
+      if (window.__bub) window.__bub(e.clientX,e.clientY,2); }
+  },{passive:true});
+  addEventListener('pointerdown', e=>{ ripple(e.clientX,e.clientY,1.2); if (window.__bub) window.__bub(e.clientX,e.clientY,7); },{passive:true});
+  document.addEventListener('pointerleave', ()=>{ W2.tglow=0; });
 
   const hudEl = document.getElementById('hud');
   function onScroll(){
@@ -546,6 +643,10 @@
         a: Math.random()*0.35+0.1
       };
     }
+    const extra = [];   // bąbelki wypuszczane przez kursor
+    window.__bub = (x,y,n) => { for (let k=0;k<n && extra.length<70;k++) extra.push({
+      x:x/innerWidth+(Math.random()-.5)*.012, y:y/innerHeight+(Math.random()-.5)*.012,
+      r:Math.random()*2.4+.9, v:Math.random()*.0022+.0012, drift:(Math.random()-.5)*.0009, a:.55+Math.random()*.3, life:1 }); };
     let lastP = 0;
     (function loop(){
       ctx.clearRect(0,0,W,H);
@@ -554,11 +655,22 @@
       for (let b of parts){
         b.y -= b.v + boost;
         b.x += b.drift;
+        // rozstępują się przed kursorem
+        const dx = b.x*innerWidth - W2.mx, dy = b.y*innerHeight - W2.my, dd = dx*dx+dy*dy;
+        if (dd < 14400 && dd > 1){ const f = (1 - Math.sqrt(dd)/120)*.9; b.x += dx/Math.sqrt(dd)*f/innerWidth; b.y += dy/Math.sqrt(dd)*f/innerHeight; }
         if (b.y < -0.05) Object.assign(b, spawn(false));
         ctx.beginPath();
         ctx.arc(b.x*W, b.y*H, b.r*devicePixelRatio, 0, 7);
         ctx.fillStyle = `rgba(200,235,240,${b.a*(0.35+0.65*(1-p))})`;
         ctx.fill();
+      }
+      for (let k=extra.length-1;k>=0;k--){
+        const b = extra[k];
+        b.y -= b.v; b.x += b.drift + Math.sin((b.y+k)*40)*.0004; b.life -= .006;
+        if (b.life <= 0 || b.y < -0.05){ extra.splice(k,1); continue; }
+        ctx.beginPath(); ctx.arc(b.x*W, b.y*H, b.r*devicePixelRatio, 0, 7);
+        ctx.strokeStyle = `rgba(210,240,245,${b.a*b.life})`; ctx.lineWidth = devicePixelRatio*.8; ctx.stroke();
+        ctx.fillStyle = `rgba(200,235,240,${b.a*b.life*.25})`; ctx.fill();
       }
       requestAnimationFrame(loop);
     })();
