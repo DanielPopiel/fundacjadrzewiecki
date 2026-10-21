@@ -284,6 +284,31 @@
   }
 
 
+  /* ---------- zdjęcia: unoszą się jak w wodzie, przechylają za kursorem ---------- */
+  .plate.float{animation:bob 7s ease-in-out infinite;will-change:transform}
+  .duo .plate.float:last-child{animation-duration:8.5s;animation-delay:-3s}
+  .patron-portrait.float{animation-duration:9s;animation-delay:-5s}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-9px) rotate(.35deg)}}
+  .plate.float .ph{display:block;overflow:hidden;cursor:zoom-in;perspective:900px}
+  .plate.float .ph img{transition:transform .5s cubic-bezier(.2,.7,.2,1);transform-origin:center;will-change:transform}
+  .plate.float:hover{border-color:rgba(201,162,75,.45)}
+  .plate.float .ph:focus-visible{outline:1px solid var(--brass);outline-offset:3px}
+
+  /* ---------- powiększenie (lightbox) ---------- */
+  #lb{position:fixed;inset:0;z-index:50;display:none}
+  #lb.open,#lb.closing{display:block}
+  #lb .bg{position:absolute;inset:0;background:rgba(1,6,9,.86);opacity:0;transition:opacity .45s ease}
+  #lb.show .bg{opacity:1}
+  #lb .big{position:fixed;left:0;top:0;transform-origin:0 0;box-shadow:0 30px 90px rgba(0,0,0,.6),0 0 0 1px rgba(143,216,228,.18);
+    transition:transform .55s cubic-bezier(.2,.75,.15,1);cursor:zoom-out;will-change:transform}
+  #lb .cap{position:fixed;left:0;right:0;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--brass);opacity:0;transition:opacity .4s ease .15s;pointer-events:none}
+  #lb.show .cap{opacity:1}
+  #lb .x{position:fixed;top:18px;right:20px;width:46px;height:46px;border:1px solid rgba(143,216,228,.3);background:rgba(3,16,26,.6);
+    color:var(--paper);font:300 22px/1 'IBM Plex Mono',monospace;cursor:pointer;opacity:0;transition:opacity .3s,border-color .3s}
+  #lb.show .x{opacity:1}
+  #lb .x:hover,#lb .x:focus-visible{border-color:var(--brass);outline:none}
+
   @media (max-width:900px){
     .split,.split.rev{grid-template-columns:1fr;gap:34px}
     .split.rev .col-text{order:1}
@@ -306,6 +331,8 @@
     footer span:last-child{text-align:left}
   }
   @media (prefers-reduced-motion:reduce){
+    .plate.float{animation:none}
+    #lb .big,#lb .bg{transition:none}
     .reveal{opacity:1;transform:none;transition:none}
     .scroll-hint::after{animation:none}
     html{scroll-behavior:auto}
@@ -474,6 +501,13 @@
     </div>
   </section>
 </main>
+
+<div id="lb" role="dialog" aria-modal="true" aria-label="Powiększone zdjęcie">
+  <div class="bg"></div>
+  <img class="big" alt="">
+  <p class="cap"></p>
+  <button class="x" type="button" aria-label="Zamknij">×</button>
+</div>
 
 <footer>
   <span>© 2026 Fundacja im. Stefana Drzewieckiego</span>
@@ -698,6 +732,64 @@ void main(){
     })();
   }
 
+
+  /* ------ zdjęcia: owinięcie, przechył i powiększenie ------ */
+  (function(){
+    const plates=[...document.querySelectorAll('main figure.plate')];
+    const fine=matchMedia('(pointer:fine)').matches;
+    plates.forEach(f=>{
+      const img=f.querySelector('img'); if(!img) return;
+      f.classList.add('float');
+      const ph=document.createElement('span'); ph.className='ph'; ph.tabIndex=0; ph.setAttribute('role','button');
+      ph.setAttribute('aria-label','Powiększ zdjęcie'); img.replaceWith(ph); ph.appendChild(img);
+      if(fine && !reduced){
+        ph.addEventListener('pointermove',e=>{ const r=ph.getBoundingClientRect();
+          const x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5;
+          img.style.transform=`rotateY(${(x*7).toFixed(2)}deg) rotateX(${(-y*7).toFixed(2)}deg) scale(1.045)`; });
+        ph.addEventListener('pointerleave',()=>{ img.style.transform=''; });
+      }
+      const open=()=>openLB(img, (f.querySelector('figcaption b')||{}).textContent||'');
+      ph.addEventListener('click',open);
+      ph.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(); } });
+    });
+
+    const lb=document.getElementById('lb'), big=lb.querySelector('.big'), cap=lb.querySelector('.cap'), xb=lb.querySelector('.x');
+    let src=null, busy=false;
+    function target(img){
+      const vw=innerWidth, vh=innerHeight, iw=img.naturalWidth||img.width, ih=img.naturalHeight||img.height;
+      const s=Math.min(vw*.9/iw, vh*.8/ih); const w=iw*s, h=ih*s;
+      return {x:(vw-w)/2, y:(vh-h)/2-14, w, h};
+    }
+    function fromRect(r,t){ return `translate(${r.left}px,${r.top}px) scale(${r.width/t.w},${r.height/t.h})`; }
+    function openLB(img,text){
+      if(busy) return; busy=true; src=img;
+      img.style.transform='';
+      big.src=img.currentSrc||img.src; big.alt=img.alt; cap.textContent=text;
+      const t=target(img), r=img.getBoundingClientRect();
+      big.style.width=t.w+'px'; big.style.height=t.h+'px';
+      cap.style.top=(t.y+t.h+18)+'px';
+      big.style.transition='none'; big.style.transform=fromRect(r,t);
+      lb.classList.add('open'); src.style.visibility='hidden';
+      document.documentElement.style.overflow='hidden';
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        big.style.transition=''; big.style.transform=`translate(${t.x}px,${t.y}px) scale(1,1)`;
+        lb.classList.add('show'); setTimeout(()=>{busy=false; xb.focus({preventScroll:true});},560);
+      }));
+    }
+    function closeLB(){
+      if(!lb.classList.contains('open')||busy) return; busy=true;
+      const t=target(src), r=src.getBoundingClientRect();
+      lb.classList.remove('show'); lb.classList.add('closing');
+      big.style.transform=fromRect(r,t);
+      setTimeout(()=>{ lb.classList.remove('open','closing'); src.style.visibility=''; document.documentElement.style.overflow='';
+        busy=false; const ph=src.parentElement; ph&&ph.focus({preventScroll:true}); },560);
+    }
+    lb.addEventListener('click',closeLB);
+    addEventListener('keydown',e=>{ if(e.key==='Escape') closeLB(); });
+    addEventListener('resize',()=>{ if(lb.classList.contains('open')&&!busy){ const t=target(src);
+      big.style.width=t.w+'px'; big.style.height=t.h+'px'; big.style.transition='none';
+      big.style.transform=`translate(${t.x}px,${t.y}px)`; cap.style.top=(t.y+t.h+18)+'px'; } });
+  })();
 
   /* ------ reveal sekcji ------ */
   const io = new IntersectionObserver(es=>{
