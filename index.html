@@ -215,7 +215,7 @@
   @media (max-width:900px){.socials{grid-template-columns:1fr}}
   @media (max-width:820px){.soc{padding:14px;gap:12px}.soc-main{gap:12px}.soc-ico{width:34px;height:34px}.soc-txt b{font-size:17px}.soc-txt .go{font-size:10px;letter-spacing:.08em}.qr img{width:76px;height:76px;padding:5px}}
   .sign{margin-top:26px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--brass)}
-  footer span:last-child{max-width:70ch;text-align:right}
+  footer span:last-child{max-width:80ch;text-align:right;line-height:2}
 
   /* twórcy */
   .founders{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:44px}
@@ -266,6 +266,11 @@
   #dno .socials{margin-left:auto;margin-right:auto}
   #dno .soc{text-align:left}
   #dno .cta{margin-top:38px}
+  .k-osoba2{border-top:0;margin-top:22px;padding-top:0}
+  /* dwa zdjęcia: niebo i głębina, lekko przesunięte */
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+  .duo .plate:last-child{margin-top:70px}
+  .duo .plate figcaption{font-size:9px}
   #dno .socials{margin-top:56px}
   .org{font-family:'IBM Plex Mono',monospace;text-transform:uppercase;margin-top:6px}
   .org b{display:block;font-weight:500;font-size:clamp(13px,1.3vw,16px);letter-spacing:.14em;color:var(--paper);line-height:1.6}
@@ -292,6 +297,7 @@
     #hud.scrolled .hud-top{padding:8px 16px}
     .hud-top .brand .txt small{display:none}
     section{padding:12vh 8vw 8vh;min-height:0}
+    .duo .plate:last-child{margin-top:40px}
     .reveal{transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
     #hero{min-height:100svh}
     footer{flex-direction:column;align-items:center;text-align:center}
@@ -391,7 +397,11 @@
           odkrywania nowych światów.</p>
           <p class="sign">Rafał Duch · Łukasz Jaczun</p>
         </div>
-        <div class="col-media">
+        <div class="col-media duo">
+          <figure class="plate">
+            <img src="assets/mig.jpg" width="1024" height="1536" loading="lazy" alt="Pilot w historycznym ubiorze wysokościowym i hełmie wchodzi po drabince do kabiny myśliwca MiG o numerze 728">
+            <figcaption><span></span><b>Fot. FoxTwo.pl</b></figcaption>
+          </figure>
           <figure class="plate">
             <img src="assets/nurkowie.jpg" width="1000" height="1333" loading="lazy" alt="Dwóch nurków w historycznym sprzęcie nurkowym stoi na nabrzeżu o zachodzie słońca">
             <figcaption><span></span><b>Fot. Łukasz Jaczun</b></figcaption>
@@ -440,6 +450,8 @@
         <p class="k-osoba"><span>Prezes Fundacji</span><b>Rafał Duch</b>
           <a href="tel:+48517019609">+48 517 019 609</a><br>
           <a href="mailto:duch.rafal@fundacjadrzewiecki.pl">duch.rafal@fundacjadrzewiecki.pl</a></p>
+        <p class="k-osoba k-osoba2"><span>Wiceprezes Fundacji</span><b>Łukasz Jaczun</b>
+          <a href="tel:+48603985166">+48 603 985 166</a></p>
         <p class="k-reg"><span>KRS 0001152807</span><span>REGON 54078315900000</span><span>NIP 6040256714</span></p>
       </div>
       <a class="cta" href="mailto:duch.rafal@fundacjadrzewiecki.pl?subject=Kontakt%20—%20Fundacja%20im.%20Stefana%20Drzewieckiego">Napisz do nas</a>
@@ -465,7 +477,7 @@
 
 <footer>
   <span>© 2026 Fundacja im. Stefana Drzewieckiego</span>
-  <span>Zdjęcia pilotów: FoxTwo.pl — Michał Wajnchold, Leszek Kujawski, Przemek Szynkora · Statyści: Mikołaj Żukowski, Tytus Chaładus</span>
+  <span>Zdjęcia pilotów: FoxTwo.pl — Michał Wajnchold, Leszek Kujawski, Przemek Szynkora · Statyści: Mikołaj Żukowski, Tytus Chaładus<br>Sesja zdjęciowa z samolotem MiG-19 dzięki uprzejmości 31.&nbsp;Bazy Lotnictwa Taktycznego</span>
 </footer>
 
 <script>
