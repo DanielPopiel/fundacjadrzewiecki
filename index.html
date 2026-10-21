@@ -271,10 +271,21 @@
   #dno .cta{margin-top:38px}
   .k-osoby{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;margin-top:26px;padding-top:22px;border-top:1px solid var(--hud-line)}
   .sign i{font-style:normal;opacity:.6}
-  @media (max-width:700px){.sign{font-size:18px}}
+  @media (max-width:700px){.sign{font-size:16px;letter-spacing:.08em;white-space:nowrap}}
   .k-osoby .k-osoba{margin:0;padding:0;border:0}
   #dno .kontakt{max-width:820px}
-  @media (max-width:700px){.k-osoby{grid-template-columns:1fr;gap:26px}}
+  @media (max-width:700px){
+    .k-osoby{gap:0 14px}
+    .k-osoby .k-osoba{font-size:14px;line-height:1.65}
+    .k-osoby .k-osoba span{font-size:12px}
+    .k-osoby .k-osoba b{font-size:17px;margin-bottom:4px}
+    .k-osoby .k-osoba a{display:inline-block;margin-top:2px}
+    /* tekst wyjustowany na telefonie (poza nagłówkiem strony i kontaktem) */
+    main section:not(#hero):not(#dno) .lead, main section:not(#hero):not(#dno) p.muted{
+      text-align:justify;hyphens:auto;-webkit-hyphens:auto;word-spacing:-.02em}
+    main section:not(#hero):not(#dno) .lead{font-size:16.5px}
+    main section:not(#hero):not(#dno) p.muted{font-size:15px}
+  }
   /* dwa zdjęcia: niebo i głębina, lekko przesunięte */
   .duo{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
   .duo .plate:last-child{margin-top:70px}
@@ -480,10 +491,10 @@
         <div class="k-osoby">
         <p class="k-osoba"><span>Prezes Fundacji</span><b>Rafał Duch</b>
           <a href="tel:+48517019609">+48 517 019 609</a><br>
-          <a href="mailto:duch.rafal@fundacjadrzewiecki.pl">duch.rafal@fundacjadrzewiecki.pl</a></p>
+          <a href="mailto:duch.rafal@fundacjadrzewiecki.pl">duch.rafal@<wbr>fundacjadrzewiecki.pl</a></p>
         <p class="k-osoba k-osoba2"><span>Wiceprezes Fundacji</span><b>Łukasz Jaczun</b>
           <a href="tel:+48603985166">+48 603 985 166</a><br>
-          <a href="mailto:jaczun.lukasz@fundacjadrzewiecki.pl">jaczun.lukasz@fundacjadrzewiecki.pl</a></p>
+          <a href="mailto:jaczun.lukasz@fundacjadrzewiecki.pl">jaczun.lukasz@<wbr>fundacjadrzewiecki.pl</a></p>
         </div>
         <p class="k-reg"><span>KRS 0001152807</span><span>REGON 54078315900000</span><span>NIP 6040256714</span></p>
       </div>
