@@ -350,7 +350,9 @@
     .hud-top{padding:10px 16px}
     #hud.scrolled .hud-top{padding:8px 16px}
     .hud-top .brand .txt small{display:none}
-    section{padding:12vh 8vw 8vh;min-height:0}
+    section{padding:44px 7vw 44px;min-height:0}
+    #dno{min-height:0;padding-bottom:40px}
+    #dno .inner{padding-top:40px}
     .duo .plate:last-child{margin-top:40px}
     .reveal{transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
     #hero{min-height:100svh}
@@ -550,6 +552,7 @@
 <script>
 (function(){
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const touch = matchMedia('(pointer:coarse)').matches;   // telefon: tło stoi, bez zoomu przy scrollu
   const poster = document.getElementById('diver-poster');
   const water = document.getElementById('water');
   const stage = document.getElementById('stage');
@@ -590,8 +593,8 @@
       my += (tmy - my) * 0.06;
       parX = -mx * 14; parY = -my * 10;   // parallaksa rysowana wprost w canvasie
       const fl = `brightness(${1 - p*0.55}) saturate(${1 - p*0.22})`;
-      poster.style.filter = fl;
-      poster.style.transform = `translate(${parX.toFixed(2)}px, ${parY.toFixed(2)}px) scale(${(1.04 + p*0.12).toFixed(4)})`;
+      if (!poster.classList.contains("off")) poster.style.filter = fl;   // ukryty obrazek nie potrzebuje filtra (koszt na telefonie)
+      if (!touch) poster.style.transform = `translate(${parX.toFixed(2)}px, ${parY.toFixed(2)}px) scale(${(1.04 + p*0.12).toFixed(4)})`;
     }
     shade.style.opacity = Math.min(1, p * 1.25);
     tint.style.opacity = p;
@@ -674,7 +677,7 @@ void main(){
       W2.glow+=(W2.tglow-W2.glow)*.06; W2.tglow*=.985;
       gl.uniform2f(U.res,cw,ch); gl.uniform1f(U.time,tm); gl.uniform1f(U.dpr,dpr);
       gl.uniform1f(U.br,1 - p*0.55); gl.uniform1f(U.sat,1 - p*0.22);
-      gl.uniform1f(U.sc,1.04+p*.12); gl.uniform2f(U.par,parX,parY);
+      gl.uniform1f(U.sc,touch?1.04:1.04+p*.12); gl.uniform2f(U.par,parX,parY);
       gl.uniform2f(U.mouse,W2.mx,W2.my); gl.uniform1f(U.glow,W2.glow);
       gl.uniform4fv(U.rip,W2.rips);
       gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
