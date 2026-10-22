@@ -15,3 +15,7 @@ na https://fundacjadrzewiecki.pl
 ```
 node dev-server.js
 ```
+
+## Wersja angielska
+`en/index.html` jest generowany z `index.html` skryptem `tools/build_en.py`
+(pary tekst PL → EN). Po każdej zmianie w wersji polskiej: `python3 tools/build_en.py`.

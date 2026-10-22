@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stefan Drzewiecki Foundation — The Deep, the Sky and Space</title>
+<meta name="description" content="The Stefan Drzewiecki Foundation for the History of the Conquest of the Deep, the Sky and Space — promoting the historical legacy of Polish underwater, aviation and space technology: special garments and equipment that keep people alive.">
+<link rel="icon" href="../assets/logo-brass.png">
+<link rel="alternate" hreflang="pl" href="https://danielpopiel.github.io/fundacjadrzewiecki/">
+<link rel="alternate" hreflang="en" href="https://danielpopiel.github.io/fundacjadrzewiecki/en/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:opsz,wght@10..72,300;10..72,500;10..72,700&family=IBM+Plex+Mono:wght@300;400;500&family=Spectral:ital,wght@0,200;0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --abyss-0:#0b2530;      /* woda przy powierzchni */
+    --abyss-1:#071a24;
+    --abyss-2:#03101a;
+    --abyss-3:#010609;      /* dno */
+    --cyan:#8fd8e4;         /* poświata wody / HUD */
+    --cyan-dim:#4d8b99;
+    --brass:#c9a24b;        /* mosiądz hełmu, skafander */
+    --brass-dim:#8a713a;
+    --paper:#e9f3f4;        /* tekst główny */
+    --paper-dim:#bcd0d3;
+    --hud-line:rgba(143,216,228,.28);
+    --maxw:1120px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:70px}
+  body{
+    background:var(--abyss-3);
+    color:var(--paper);
+    font-family:'Spectral',Georgia,serif;
+    font-weight:300;
+    line-height:1.7;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--brass);color:var(--abyss-3)}
+  img{display:block}
+
+  /* ---------- SCENA (warstwa stała) ---------- */
+  /* 100lvh = wysokość z ukrytym paskiem adresu: tło nie odsłania czarnego pasa przy przewijaniu na telefonie */
+  #stage{position:fixed;top:0;left:0;right:0;height:100vh;height:100lvh;z-index:0;overflow:hidden;background:var(--abyss-2)}
+  .diverlayer{
+    position:absolute;inset:0;width:100%;height:100%;
+    will-change:transform,filter;
+  }
+  #diver-poster{z-index:1;object-fit:cover;object-position:50% 42%;transition:opacity .8s ease}
+  #diver-poster.off{opacity:0}
+  #water{z-index:2;opacity:0;transition:opacity .8s ease}
+  #water.on{opacity:1}
+  #shade{ /* przyciemnianie z głębokością */
+    position:absolute;inset:0;pointer-events:none;z-index:3;
+    background:
+      radial-gradient(120% 90% at 50% 42%, transparent 30%, rgba(1,6,9,.92) 100%),
+      linear-gradient(180deg, rgba(1,6,9,0) 0%, rgba(1,6,9,.85) 100%);
+    opacity:0;
+    will-change:opacity;
+  }
+  #tint{ /* zimniejszy odcień im głębiej */
+    position:absolute;inset:0;pointer-events:none;z-index:3;
+    background:linear-gradient(180deg, rgba(2,16,26,.0), rgba(1,8,14,.55));
+    mix-blend-mode:multiply;opacity:0;will-change:opacity;
+  }
+  #bubbles{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
+
+  /* ---------- HUD ---------- */
+  #hud{
+    position:fixed;z-index:5;left:0;right:0;top:0;bottom:0;
+    pointer-events:none;
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--cyan);
+  }
+  .hud-top{
+    position:absolute;top:0;left:0;right:0;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:12px 28px;
+    font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    background:linear-gradient(180deg,rgba(3,16,26,.42),rgba(3,16,26,.18));
+    border-bottom:1px solid rgba(143,216,228,.06);
+    transition:background .4s ease,padding .4s ease;
+  }
+  /* mosiężna nitka pod paskiem — wygasa ku krawędziom */
+  .hud-top::after{
+    content:'';position:absolute;left:0;right:0;bottom:-1px;height:1px;pointer-events:none;
+    background:linear-gradient(90deg,transparent 0%,rgba(201,162,75,.0) 8%,rgba(201,162,75,.55) 50%,rgba(201,162,75,0) 92%,transparent 100%);
+    opacity:.3;transition:opacity .4s ease;
+  }
+  #hud.scrolled .hud-top{background:linear-gradient(180deg,rgba(3,16,26,.7),rgba(3,16,26,.55));padding:9px 28px}
+  #hud.scrolled .hud-top::after{opacity:.6}
+  .hud-top .brand{display:flex;align-items:center;gap:14px}
+  .hud-top .brand img{width:42px;height:42px;opacity:.95;flex:none;transition:width .4s,height .4s}
+  #hud.scrolled .hud-top .brand img{width:36px;height:36px}
+  .hud-top .brand .txt b{color:var(--paper);font-weight:500;display:block;letter-spacing:.14em}
+  .hud-top .brand .txt small{display:block;color:rgba(143,216,228,.78);font-weight:300;letter-spacing:.2em;margin-top:4px;font-size:9.5px}
+  .hud-top nav{pointer-events:auto;display:flex;gap:28px}
+  .hud-right{display:flex;align-items:center;gap:28px}
+  /* przełącznik języka: mosiężna ramka, aktywny język podświetlony */
+  .lang{pointer-events:auto;display:flex;align-items:center;border:1px solid rgba(201,162,75,.35);padding:2px}
+  .lang a{color:rgba(233,243,244,.6);text-decoration:none;font-weight:500;letter-spacing:.16em;padding:5px 8px 5px 10px;transition:color .25s,background .25s}
+  .lang a:hover,.lang a:focus-visible{color:var(--paper);outline:none}
+  .lang a[aria-current]{color:var(--abyss-3);background:var(--brass)}
+  .lang i{width:1px;height:12px;background:rgba(201,162,75,.35);margin:0 1px}
+  .hud-top nav a{
+    position:relative;color:var(--paper);font-weight:500;letter-spacing:.14em;text-decoration:none;
+    transition:color .25s;padding-bottom:5px;
+  }
+  .hud-top nav a::after{  /* cienka mosiężna kreska — pojawia się przy najechaniu */
+    content:'';position:absolute;left:0;right:0;bottom:0;height:1px;
+    background:var(--brass);transform:scaleX(0);transform-origin:left;
+    transition:transform .3s ease;
+  }
+  .hud-top nav a:hover,.hud-top nav a:focus-visible{color:var(--brass)}
+  .hud-top nav a:hover::after,.hud-top nav a:focus-visible::after{transform:scaleX(1)}
+  .hud-top nav a:focus-visible{outline:1px solid var(--cyan);outline-offset:4px}
+
+  .scroll-hint{
+    position:absolute;bottom:28px;left:50%;transform:translateX(-50%);
+    font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--cyan-dim);
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+    transition:opacity .5s;
+  }
+  .scroll-hint::after{
+    content:'';width:1px;height:38px;background:linear-gradient(var(--cyan),transparent);
+    animation:drop 2.2s ease-in-out infinite;
+  }
+  @keyframes drop{0%{transform:scaleY(0);transform-origin:top}55%{transform:scaleY(1);transform-origin:top}56%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+  /* ---------- TREŚĆ ---------- */
+  main{position:relative;z-index:2}
+  section{min-height:100vh;display:flex;align-items:center;padding:14vh 7vw}
+  .inner{max-width:var(--maxw);margin:0 auto;width:100%}
+
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--paper);margin-bottom:22px;
+    display:flex;align-items:center;gap:14px;text-shadow:0 1px 14px rgba(1,6,9,.85);
+  }
+  .eyebrow::before{content:'';width:34px;height:1px;background:var(--brass)}
+
+  h1,h2{font-family:'Big Shoulders','Arial Narrow',sans-serif;text-transform:uppercase;line-height:.95}
+  h1{font-size:clamp(44px,7.4vw,112px);font-weight:700;letter-spacing:.01em}
+  h1 .thin{display:block;font-weight:300;text-shadow:0 1px 12px rgba(1,6,9,.75);font-size:.34em;letter-spacing:.12em;color:var(--cyan);margin-bottom:16px;line-height:1.2}
+  h2{font-size:clamp(36px,5.2vw,72px);font-weight:500;letter-spacing:.02em;margin-bottom:26px}
+  h1 .thin.sub{margin:26px 0 0;font-size:.36em}
+  h2 em{font-style:normal;color:var(--brass)}
+
+  .lead{font-size:clamp(17px,1.6vw,21px);max-width:56ch;color:var(--paper)}
+  p.muted{color:var(--paper-dim);max-width:60ch;margin-top:18px}
+  p.muted + p.muted{margin-top:14px}
+
+  /* karty eksponatów w snopie światła */
+  .exhibit{
+    margin-top:40px;
+    border-left:1px solid var(--hud-line);
+    padding:6px 0 6px 28px;
+    max-width:520px;
+  }
+  .exhibit .tag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.24em;color:var(--cyan-dim);text-transform:uppercase}
+  .exhibit .name{font-family:'Big Shoulders',sans-serif;font-size:26px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin:8px 0 6px}
+  .exhibit p{font-size:15px;color:var(--paper-dim)}
+
+  /* dwie kolumny: treść + archiwalna plansza ze zdjęciem */
+  .split{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
+  .split.rev{grid-template-columns:.95fr 1.05fr}
+  .split.rev .col-text{order:2}
+  .split.rev .col-media{order:1}
+
+  .plate{position:relative;border:1px solid var(--hud-line);padding:10px;background:rgba(3,16,26,.35)}
+  .plate img{width:100%;height:auto;filter:saturate(.92) contrast(1.02)}
+  .plate figcaption{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;
+    color:var(--cyan-dim);text-transform:uppercase;margin-top:10px;line-height:1.6;
+    display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  }
+  .plate figcaption b{color:var(--brass);font-weight:400}
+  .plate::before,.plate::after{content:'';position:absolute;width:10px;height:10px;border:1px solid var(--cyan-dim);opacity:.6}
+  .plate::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+  .plate::after{bottom:44px;right:-1px;border-left:0;border-top:0}
+
+  /* sekcje-strefy: treść wjeżdża */
+  .reveal{opacity:0;transform:translateY(46px);transition:opacity 1s ease,transform 1s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  /* hero */
+  #hero{align-items:center;justify-content:center;text-align:center}
+  #hero .inner{max-width:var(--maxw)}
+  #hero h1{font-size:clamp(40px,5.6vw,84px);text-wrap:balance}
+  #hero .lead{margin:30px auto 0;max-width:50ch;text-shadow:0 1px 18px rgba(1,6,9,.7)}
+
+  /* patron */
+  #patron .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:60px;align-items:start}
+  .fact-list{border-top:1px solid var(--hud-line);margin-top:10px}
+  .fact-list div{
+    border-bottom:1px solid var(--hud-line);padding:16px 0;
+    display:flex;gap:22px;align-items:baseline;
+  }
+  .fact-list b{font-family:'IBM Plex Mono',monospace;font-weight:400;font-size:13px;color:var(--brass);min-width:58px;letter-spacing:.06em}
+  .fact-list span{color:var(--paper-dim);font-size:15px}
+  .patron-portrait{max-width:340px;margin:8px 0 34px}
+  .patron-portrait img{width:100%;height:auto}
+  /* media społecznościowe */
+  .socials{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:46px;max-width:860px}
+  .soc{position:relative;display:flex;align-items:center;justify-content:space-between;gap:20px;
+    padding:20px 20px 20px 22px;border:1px solid var(--hud-line);background:rgba(3,16,26,.55);
+    color:var(--paper);text-decoration:none;transition:border-color .3s,background .3s,transform .3s}
+  .soc::before,.soc::after{content:'';position:absolute;width:10px;height:10px;border:1px solid var(--brass);opacity:.8}
+  .soc::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+  .soc::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+  .soc:hover,.soc:focus-visible{border-color:var(--brass-dim);background:rgba(7,26,36,.75);transform:translateY(-2px)}
+  .soc:focus-visible{outline:1px solid var(--cyan);outline-offset:4px}
+  .soc-main{display:flex;align-items:center;gap:18px;min-width:0}
+  .soc-ico{width:54px;height:54px;flex:none;fill:none;stroke:var(--brass);stroke-width:1.4;stroke-linejoin:round;transition:stroke .3s}
+  .soc-ico .dot{fill:var(--brass);stroke:none}
+  .soc:hover .soc-ico{stroke:var(--cyan)}
+  .soc-txt{display:flex;flex-direction:column;min-width:0}
+  .soc-txt .k{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--cyan-dim)}
+  .soc-txt b{font-family:'Big Shoulders',sans-serif;font-weight:500;font-size:22px;letter-spacing:.03em;text-transform:uppercase;line-height:1.1;margin:4px 0 6px}
+  .soc-txt .go{white-space:nowrap;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:var(--brass)}
+  .qr{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px}
+  .qr img{width:96px;height:96px;background:var(--paper);padding:7px;image-rendering:pixelated}
+  .qr small{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--cyan-dim)}
+  @media (max-width:900px){.socials{grid-template-columns:1fr}}
+  @media (max-width:820px){.soc{padding:14px;gap:12px}.soc-main{gap:12px}.soc-ico{width:34px;height:34px}.soc-txt b{font-size:17px}.soc-txt .go{font-size:10px;letter-spacing:.08em}.qr img{width:76px;height:76px;padding:5px}}
+  .sign{margin-top:26px;font-family:'IBM Plex Mono',monospace;font-size:24px;letter-spacing:.12em;line-height:1.4;text-transform:uppercase;color:var(--brass)}
+  footer span:nth-child(2){max-width:80ch;text-align:right;line-height:2}
+  footer .credit{flex-basis:100%;text-align:center;font-size:9px;letter-spacing:.24em;color:rgba(143,216,228,.38);margin-top:6px}
+  footer .credit a{color:inherit;text-decoration:none;border-bottom:1px solid rgba(201,162,75,.25);transition:color .25s,border-color .25s}
+  footer .credit a:hover{color:var(--brass);border-color:var(--brass)}
+
+  /* twórcy */
+  .founders{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:44px}
+  .founder{border-top:1px solid var(--hud-line);padding-top:0}
+  .founder .plate{padding:8px}
+  .founder .role{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--cyan-dim);margin-top:18px}
+  .founder .fname{font-family:'Big Shoulders',sans-serif;font-size:30px;font-weight:500;text-transform:uppercase;letter-spacing:.03em;margin:6px 0 8px;color:var(--paper)}
+  .founder p{font-size:14.5px;color:var(--paper-dim);max-width:42ch}
+  .founder a{color:var(--cyan);text-decoration:none;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.08em}
+  .founder a:hover{color:var(--paper)}
+
+  /* dno / kontakt */
+  #dno{min-height:100vh;align-items:flex-end;padding-bottom:10vh}
+  #dno .inner{border-top:1px solid var(--hud-line);padding-top:60px}
+  .cta{
+    display:inline-block;margin-top:34px;
+    font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--abyss-3);background:var(--brass);
+    padding:18px 34px;text-decoration:none;
+    transition:background .25s,transform .25s;
+  }
+  .cta:hover,.cta:focus-visible{background:var(--cyan);transform:translateY(-2px)}
+  .cta:focus-visible{outline:2px solid var(--paper);outline-offset:3px}
+  .contact-row{
+    display:flex;flex-wrap:wrap;gap:36px 48px;margin-top:50px;
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:500;letter-spacing:.14em;color:var(--paper);
+    text-transform:uppercase;line-height:1.9;
+  }
+  .contact-row .k{display:block;color:rgba(143,216,228,.78);font-size:10px;font-weight:300;letter-spacing:.2em;margin-bottom:6px}
+  .contact-row a{color:var(--paper);text-decoration:none}
+  .contact-row a:hover{color:var(--brass)}
+  .kontakt{max-width:640px}
+  .kontakt p{font-family:'Spectral',Georgia,serif}
+  .k-reg{margin-top:22px;font-size:16px;color:var(--paper-dim);letter-spacing:.02em}
+  .k-reg{display:flex;flex-wrap:wrap;gap:4px 26px}
+  .k-reg span{white-space:nowrap}
+  .k-osoba{margin-top:26px;padding-top:22px;border-top:1px solid var(--hud-line);font-size:18px;line-height:1.75;color:var(--paper)}
+  .k-osoba span{display:block;font-size:15px;color:var(--paper-dim)}
+  .k-osoba b{display:block;font-weight:400;font-size:22px;margin-bottom:6px}
+  .k-osoba a{color:var(--paper);text-decoration:none;border-bottom:1px solid var(--brass-dim);transition:color .25s,border-color .25s}
+  .k-osoba a:hover{color:var(--brass);border-color:var(--brass)}
+  #dno .inner{text-align:center}
+  #dno .eyebrow{justify-content:center}
+  #dno .eyebrow::after{content:'';width:34px;height:1px;background:var(--brass)}
+  #dno .kontakt{margin:0 auto}
+  #dno .lead{margin-left:auto;margin-right:auto}
+  #dno .k-reg{justify-content:center}
+  #dno .socials{margin-left:auto;margin-right:auto}
+  #dno .soc{text-align:left}
+  #dno .cta{margin-top:38px}
+  .k-osoby{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;margin-top:26px;padding-top:22px;border-top:1px solid var(--hud-line)}
+  .sign i{font-style:normal;opacity:.6}
+  @media (max-width:700px){.sign{font-size:16px;letter-spacing:.08em;white-space:nowrap}}
+  .k-osoby .k-osoba{margin:0;padding:0;border:0}
+  #dno .kontakt{max-width:820px}
+  @media (max-width:700px){
+    .k-osoby{gap:0 14px}
+    .k-osoby .k-osoba{font-size:14px;line-height:1.65}
+    .k-osoby .k-osoba span{font-size:12px}
+    .k-osoby .k-osoba b{font-size:17px;margin-bottom:4px}
+    .k-osoby .k-osoba a{display:inline-block;margin-top:2px}
+    /* tekst wyjustowany na telefonie (poza nagłówkiem strony i kontaktem) */
+    main section:not(#hero):not(#dno) .lead, main section:not(#hero):not(#dno) p.muted{
+      text-align:justify;hyphens:auto;-webkit-hyphens:auto;word-spacing:-.02em}
+    main section:not(#hero):not(#dno) .lead{font-size:16.5px}
+    main section:not(#hero):not(#dno) p.muted{font-size:15px}
+  }
+  /* dwa zdjęcia: niebo i głębina, lekko przesunięte */
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+  .duo .plate:last-child{margin-top:70px}
+  .duo .plate figcaption{font-size:9px}
+  #dno .socials{margin-top:56px}
+  .org{font-family:'IBM Plex Mono',monospace;text-transform:uppercase;margin-top:6px}
+  .org b{display:block;font-weight:500;font-size:clamp(13px,1.3vw,16px);letter-spacing:.14em;color:var(--paper);line-height:1.6}
+  .org small{display:block;margin-top:6px;font-weight:300;font-size:12px;letter-spacing:.2em;color:rgba(143,216,228,.78)}
+  .reg{margin-top:40px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.14em;color:rgba(143,216,228,.78);display:flex;gap:26px;flex-wrap:wrap}
+  footer{
+    position:relative;z-index:2;
+    padding:26px 7vw;font-family:'IBM Plex Mono',monospace;
+    font-size:10px;letter-spacing:.2em;color:var(--cyan-dim);text-transform:uppercase;
+    display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+  }
+
+
+  /* ---------- zdjęcia: unoszą się jak w wodzie, przechylają za kursorem ---------- */
+  .plate.float{animation:bob 7s ease-in-out infinite;will-change:transform}
+  .duo .plate.float:last-child{animation-duration:8.5s;animation-delay:-3s}
+  .patron-portrait.float{animation-duration:9s;animation-delay:-5s}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-9px) rotate(.35deg)}}
+  .plate.float .ph{display:block;overflow:hidden;cursor:zoom-in;perspective:900px}
+  .plate.float .ph img{transition:transform .5s cubic-bezier(.2,.7,.2,1);transform-origin:center;will-change:transform}
+  .plate.float:hover{border-color:rgba(201,162,75,.45)}
+  .plate.float .ph:focus-visible{outline:1px solid var(--brass);outline-offset:3px}
+
+  /* ---------- powiększenie (lightbox) ---------- */
+  #lb{position:fixed;inset:0;z-index:50;display:none}
+  #lb.open,#lb.closing{display:block}
+  #lb .bg{position:absolute;inset:0;background:rgba(1,6,9,.86);opacity:0;transition:opacity .45s ease}
+  #lb.show .bg{opacity:1}
+  #lb .big{position:fixed;left:0;top:0;transform-origin:0 0;box-shadow:0 30px 90px rgba(0,0,0,.6),0 0 0 1px rgba(143,216,228,.18);
+    transition:transform .55s cubic-bezier(.2,.75,.15,1);cursor:zoom-out;will-change:transform}
+  #lb .cap{position:fixed;left:0;right:0;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--brass);opacity:0;transition:opacity .4s ease .15s;pointer-events:none}
+  #lb.show .cap{opacity:1}
+  #lb .x{position:fixed;top:18px;right:20px;width:46px;height:46px;border:1px solid rgba(143,216,228,.3);background:rgba(3,16,26,.6);
+    color:var(--paper);font:300 22px/1 'IBM Plex Mono',monospace;cursor:pointer;opacity:0;transition:opacity .3s,border-color .3s}
+  #lb.show .x{opacity:1}
+  #lb .x:hover,#lb .x:focus-visible{border-color:var(--brass);outline:none}
+
+  @media (max-width:900px){
+    .split,.split.rev{grid-template-columns:1fr;gap:34px}
+    .split.rev .col-text{order:1}
+    .split.rev .col-media{order:2}
+    .founders{grid-template-columns:1fr;gap:34px}
+  }
+  @media (max-width:820px){
+    .hud-top nav{display:none}
+    .lang a{padding:4px 6px 4px 8px;font-size:10px}
+    .hud-top .brand img{width:36px;height:36px}
+    .hud-top{padding:10px 16px}
+    #hud.scrolled .hud-top{padding:8px 16px}
+    .hud-top .brand .txt small{display:none}
+    section{padding:12vh 8vw 8vh;min-height:0}
+    .duo .plate:last-child{margin-top:40px}
+    .reveal{transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+    #hero{min-height:100svh}
+    footer{flex-direction:column;align-items:center;text-align:center}
+    footer span:nth-child(2){text-align:center}
+    #patron .grid{grid-template-columns:1fr;gap:30px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .plate.float{animation:none}
+    #lb .big,#lb .bg{transition:none}
+    .reveal{opacity:1;transform:none;transition:none}
+    .scroll-hint::after{animation:none}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<!-- SCENA -->
+<div id="stage" aria-hidden="true">
+  <img id="diver-poster" class="diverlayer" src="../assets/tlo.jpg?v=2" alt="">
+  <canvas id="water" class="diverlayer"></canvas>
+  <div id="tint"></div>
+  <div id="shade"></div>
+  <canvas id="bubbles"></canvas>
+</div>
+
+<!-- HUD -->
+<div id="hud">
+  <div class="hud-top">
+    <div class="brand">
+      <img src="../assets/logo-brass.png" alt="Emblem of the Stefan Drzewiecki Foundation">
+      <span class="txt">
+        <b>Stefan Drzewiecki Foundation</b>
+        <small>History of conquering the deep, the sky and space</small>
+      </span>
+    </div>
+    <div class="hud-right">
+      <nav aria-label="Navigation">
+        <a href="#fundacja">Foundation</a>
+        <a href="#patron">Patron</a>
+        <a href="#dno">Contact</a>
+      </nav>
+      <div class="lang" role="group" aria-label="Język / Language">
+        <a href="../" hreflang="pl" lang="pl">PL</a><i></i><a href="./" hreflang="en" lang="en" aria-current="true">EN</a>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="scroll-hint" id="hint">Dive in</div>
+</div>
+
+<!-- TREŚĆ -->
+<main>
+  <section id="hero">
+    <div class="inner reveal">
+      <h1>Stefan Drzewiecki Foundation<span class="thin sub">The deep, the sky, space</span></h1>
+      <p class="lead">We promote the historical legacy of Polish underwater, aviation and space
+      technology — the special garments and equipment that allowed people to survive where
+      nature never meant them to go.</p>
+    </div>
+  </section>
+
+  <section id="fundacja">
+    <div class="inner reveal">
+      <div class="split">
+        <div class="col-text">
+          <h2>Special garments <em>and equipment</em></h2>
+          <p class="lead">The Stefan Drzewiecki Foundation is an initiative that aims to promote and raise
+          public awareness of the historical achievements of Polish underwater, aviation and space technology.
+          Our main area of interest is special garments and equipment that keep people alive in these
+          environments.</p>
+          <p class="muted">As a historical foundation, it gives a formal framework to the informational and
+          educational work driven by the interests and passion of its founders — Rafał Duch and
+          Łukasz Jaczun.</p>
+          <p class="muted">Through our publications and exhibitions we want to show the challenges faced by
+          the explorers of the deep, the sky and space, and to commemorate the work of the engineers and
+          scientists who keep pushing the limits of what technology can achieve.</p>
+        </div>
+        <div class="col-media">
+          <figure class="plate">
+            <img src="../assets/piloci.jpg" width="1000" height="1500" loading="lazy" alt="Two men in historical aviation uniforms walking across an airfield — one in a high-altitude suit with an oxygen hose, the other in a leather jacket and officer's cap">
+            <figcaption><span></span><b>Photo: FoxTwo.pl</b></figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <section id="zywioly">
+    <div class="inner reveal">
+      <div class="split rev">
+        <div class="col-text">
+          <h2>The deep and the sky <em>in one story</em></h2>
+          <p class="lead">In the history of Polish technology, the close cooperation between research centres
+          working on aerospace and on underwater technology deserves special attention.</p>
+          <p class="muted">That is why we present these subjects together, and why we chose as our patron
+          a researcher and inventor active in all three fields.</p>
+          <p class="muted">We hope our work will inspire new generations to keep developing the technical
+          civilisation that makes humanity's greatest adventure possible — the discovery of new worlds.</p>
+          <p class="sign">Rafał Duch <i>·</i> Łukasz Jaczun</p>
+        </div>
+        <div class="col-media">
+          <figure class="plate">
+            <img src="../assets/nurkowie.jpg" width="1000" height="1333" loading="lazy" alt="Two divers in historical diving gear standing on a quay at sunset">
+            <figcaption><span></span><b>Photo: Łukasz Jaczun</b></figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="patron">
+    <div class="inner reveal">
+      <div class="grid">
+        <div>
+          <h2>Stefan <em>Drzewiecki</em></h2>
+          <p class="lead">Our patron was a member of scientific societies in France, Russia and Poland, one of
+          the most outstanding Polish engineers of the 19th century and a pioneer of submarine navigation
+          and aviation technology. He is remembered as an inventor who combined theory with experiment.</p>
+          <p class="muted">His many achievements include building the first submarines with water-jet
+          propulsion and with battery-powered electric drive, designing an inherently stable aircraft, and
+          developing a general theory of the ship's screw and the aircraft propeller — including patents
+          for adjustable-pitch and self-adjusting propeller blades.</p>
+          <p class="muted">In independent Poland he was one of the founders of the Warsaw Academy of Technical
+          Sciences. In 1928 the League for Air and Anti-Gas Defence of the State made him an honorary
+          member.</p>
+          <p class="muted">Always proud of his Polish identity, Stefan Drzewiecki bequeathed his entire
+          scientific legacy to Poland. Sadly, his collections were most likely destroyed during the fighting
+          of September 1939.</p>
+        </div>
+        <div>
+          <figure class="plate patron-portrait">
+            <img src="../assets/drzewiecki.jpg" width="760" height="994" loading="lazy" alt="Stefan Drzewiecki, archival portrait">
+            <figcaption><span>Stefan Drzewiecki</span><b>1844–1938</b></figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="dno">
+    <div class="inner reveal">
+      <div class="eyebrow">Contact</div>
+      <h2>Dive deeper <em>with us</em></h2>
+      <div class="kontakt">
+        <p class="lead">Stefan Drzewiecki Foundation for the History of the Conquest of the Deep, the Sky and Space</p>
+        <div class="k-osoby">
+        <p class="k-osoba"><span>President</span><b>Rafał Duch</b>
+          <a href="tel:+48517019609">+48 517 019 609</a><br>
+          <a href="mailto:duch.rafal@fundacjadrzewiecki.pl">duch.rafal@<wbr>fundacjadrzewiecki.pl</a></p>
+        <p class="k-osoba k-osoba2"><span>Vice-President</span><b>Łukasz Jaczun</b>
+          <a href="tel:+48603985166">+48 603 985 166</a><br>
+          <a href="mailto:jaczun.lukasz@fundacjadrzewiecki.pl">jaczun.lukasz@<wbr>fundacjadrzewiecki.pl</a></p>
+        </div>
+        <p class="k-reg"><span>KRS 0001152807</span><span>REGON 54078315900000</span><span>NIP 6040256714</span></p>
+      </div>
+      <a class="cta" href="mailto:duch.rafal@fundacjadrzewiecki.pl?subject=Contact%20—%20Stefan%20Drzewiecki%20Foundation">Write to us</a>
+      <div class="socials">
+        <a class="soc" href="https://www.instagram.com/fundacjadrzewiecki" target="_blank" rel="noopener">
+          <span class="soc-main">
+            <svg class="soc-ico" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22.5"/><rect x="13" y="13" width="22" height="22" rx="6.5"/><circle cx="24" cy="24" r="5.2"/><circle class="dot" cx="30.4" cy="17.6" r="1.3"/></svg>
+            <span class="soc-txt"><span class="k">Instagram</span><b>@fundacja<wbr>drzewiecki</b><span class="go">Open profile →</span></span>
+          </span>
+          <span class="qr"><img src="../assets/qr-instagram.svg" width="33" height="33" alt="QR code for the foundation's Instagram profile"><small>Scan</small></span>
+        </a>
+        <a class="soc" href="https://www.facebook.com/profile.php?id=61572645143188" target="_blank" rel="noopener">
+          <span class="soc-main">
+            <svg class="soc-ico" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22.5"/><path d="M26.6 36V25.4h3.6l.6-4.2h-4.2v-2.7c0-1.2.4-2 2.1-2h2.2v-3.7c-.4-.1-1.7-.2-3.2-.2-3.2 0-5.3 1.9-5.3 5.5v3.1h-3.6v4.2h3.6V36"/></svg>
+            <span class="soc-txt"><span class="k">Facebook</span><b>Fundacja Drzewieckiego</b><span class="go">Open profile →</span></span>
+          </span>
+          <span class="qr"><img src="../assets/qr-facebook.svg" width="33" height="33" alt="QR code for the foundation's Facebook page"><small>Scan</small></span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="lb" role="dialog" aria-modal="true" aria-label="Enlarged photo">
+  <div class="bg"></div>
+  <img class="big" alt="">
+  <p class="cap"></p>
+  <button class="x" type="button" aria-label="Close">×</button>
+</div>
+
+<footer>
+  <span>© 2026 Stefan Drzewiecki Foundation</span>
+  <span>Pilot photos: FoxTwo.pl — Michał Wajnchold, Leszek Kujawski, Przemek Szynkora · Cast: Mikołaj Żukowski, Tytus Chaładus<br>MiG-19 photo session courtesy of the 31st Tactical Air Base</span>
+  <span class="credit">Website: Daniel Popiel · <a href="https://odnovastudio.com" target="_blank" rel="noopener">ODNOVA Studio</a> · 2026</span>
+</footer>
+
+<script>
+(function(){
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const poster = document.getElementById('diver-poster');
+  const water = document.getElementById('water');
+  const stage = document.getElementById('stage');
+  const shade = document.getElementById('shade');
+  const tint  = document.getElementById('tint');
+  const hint = document.getElementById('hint');
+
+  const MAX_M = 3000, Y_START = 2026, Y_END = 1844;
+
+  let p = 0, target = 0, raf = null;
+
+  let parX = 0, parY = 0;
+
+  /* ------ delikatna reakcja sceny na ruch myszy ------ */
+  let mx = 0, my = 0, tmx = 0, tmy = 0;
+  if (!reduced && matchMedia('(pointer:fine)').matches){
+    addEventListener('pointermove', e => {
+      tmx = (e.clientX/innerWidth  - .5) * 2;
+      tmy = (e.clientY/innerHeight - .5) * 2;
+      if (!raf) raf = requestAnimationFrame(render);
+    }, {passive:true});
+  }
+
+  function progress(){
+    const h = document.documentElement;
+    const max = h.scrollHeight - (stage.clientHeight || innerHeight);   // stała wysokość: pasek adresu nie szarpie tłem
+    return max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+  }
+
+
+  function render(){
+    // płynne dochodzenie do celu (lerp) — wrażenie bezwładności wody
+    p += (target - p) * (reduced ? 1 : 0.13);
+    if (Math.abs(target - p) < 0.0005) p = target;
+
+    if (!reduced){
+      mx += (tmx - mx) * 0.06;
+      my += (tmy - my) * 0.06;
+      parX = -mx * 14; parY = -my * 10;   // parallaksa rysowana wprost w canvasie
+      const fl = `brightness(${1 - p*0.55}) saturate(${1 - p*0.22})`;
+      poster.style.filter = fl;
+      poster.style.transform = `translate(${parX.toFixed(2)}px, ${parY.toFixed(2)}px) scale(${(1.04 + p*0.12).toFixed(4)})`;
+    }
+    shade.style.opacity = Math.min(1, p * 1.25);
+    tint.style.opacity = p;
+
+    hint.style.opacity = p > 0.03 ? 0 : 1;
+
+    const moving = Math.abs(target - p) > 0.0004 ||
+                   Math.abs(tmx - mx) > 0.001 || Math.abs(tmy - my) > 0.001;
+    if (moving) raf = requestAnimationFrame(render);
+    else raf = null;
+  }
+
+
+  /* ------ woda: tło w WebGL, falowanie i kręgi pod kursorem ------ */
+  const W2 = { on:false, mx:-9999, my:-9999, glow:0, tglow:0, rips:new Float32Array(40), ri:0, lx:0, ly:0, lt:0 };
+  window.__W2 = W2;
+  (function initWater(){
+    if (reduced) return;
+    const gl = water.getContext('webgl', {premultipliedAlpha:false, antialias:false});
+    if (!gl) return;
+    const vs = 'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
+    const fs = `precision mediump float;
+uniform sampler2D t;uniform vec2 res;uniform vec2 img;uniform float time;uniform float dpr;
+uniform float sc;uniform vec2 par;uniform vec2 mouse;uniform float glow;uniform vec4 rip[10];uniform float br;uniform float sat;
+void main(){
+  vec2 px=gl_FragCoord.xy/dpr; px.y=res.y-px.y;
+  vec2 off=vec2(sin(px.y*.011+time*.8)+.6*sin(px.x*.017-time*.55), cos(px.x*.009+time*.65)+.6*cos(px.y*.015+time*.5))*1.3;
+  for(int i=0;i<10;i++){
+    vec4 r=rip[i]; float age=time-r.z;
+    if(age>0. && age<3.){
+      vec2 d=px-r.xy; float dist=length(d)+.001;
+      float ring=exp(-abs(dist-age*170.)/38.)*exp(-age*1.5);
+      off+=d/dist*sin(dist*.07-age*9.)*ring*r.w*9.;
+    }
+  }
+  float md=length(px-mouse);
+  off+=(px-mouse)/(md+.001)*sin(md*.05-time*3.)*exp(-md/140.)*glow*3.;
+  vec2 q=(px+off-par-res*.5)/sc+res*.5;
+  float s=max(res.x/img.x,res.y/img.y); vec2 dz=img*s; vec2 o=(res-dz)*vec2(.5,.42);
+  vec3 c=texture2D(t,clamp((q-o)/dz,.001,.999)).rgb;
+  c+=vec3(.03,.09,.1)*exp(-md/240.)*glow;
+  float l=dot(c,vec3(.299,.587,.114)); c=mix(vec3(l),c,sat)*br;
+  gl_FragColor=vec4(c,1.);
+}`;
+    function sh(type, src){ const o=gl.createShader(type); gl.shaderSource(o,src); gl.compileShader(o);
+      if(!gl.getShaderParameter(o,gl.COMPILE_STATUS)) throw gl.getShaderInfoLog(o); return o; }
+    let prog;
+    try { prog=gl.createProgram(); gl.attachShader(prog,sh(gl.VERTEX_SHADER,vs)); gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,fs)); gl.linkProgram(prog); }
+    catch(e){ return; }
+    gl.useProgram(prog);
+    const buf=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+    const la=gl.getAttribLocation(prog,'a'); gl.enableVertexAttribArray(la); gl.vertexAttribPointer(la,2,gl.FLOAT,false,0,0);
+    const U={}; ['t','res','img','time','dpr','sc','par','mouse','glow','rip','br','sat'].forEach(n=>U[n]=gl.getUniformLocation(prog,n));
+    const tex=gl.createTexture();
+    function start(){
+      gl.bindTexture(gl.TEXTURE_2D,tex);
+      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+      try { gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,poster); } catch(e){ return; }
+      gl.uniform1i(U.t,0); gl.uniform2f(U.img,poster.naturalWidth,poster.naturalHeight);
+      W2.on=true; sizeW(); water.classList.add('on'); poster.classList.add('off');
+      requestAnimationFrame(frame);
+    }
+    let dpr=1, cw=0, ch=0;
+    const coarse = matchMedia('(pointer:coarse)').matches;
+    // przelicz bufor tylko gdy realnie zmienił się rozmiar sceny (pasek adresu na telefonie nie zmienia 100lvh)
+    function sizeW(){
+      const w=stage.clientWidth, h=stage.clientHeight; if(!w||!h||(w===cw&&h===ch)) return;
+      cw=w; ch=h;
+      dpr = coarse ? Math.min(devicePixelRatio||1, 1) : Math.min(devicePixelRatio||1, 1.25);
+      water.width=Math.round(w*dpr); water.height=Math.round(h*dpr);
+      gl.viewport(0,0,water.width,water.height); }
+    addEventListener('resize',sizeW);
+    const t0=performance.now();
+    function frame(now){
+      const tm=(now-t0)/1000;
+      W2.glow+=(W2.tglow-W2.glow)*.06; W2.tglow*=.985;
+      gl.uniform2f(U.res,cw,ch); gl.uniform1f(U.time,tm); gl.uniform1f(U.dpr,dpr);
+      gl.uniform1f(U.br,1 - p*0.55); gl.uniform1f(U.sat,1 - p*0.22);
+      gl.uniform1f(U.sc,1.04+p*.12); gl.uniform2f(U.par,parX,parY);
+      gl.uniform2f(U.mouse,W2.mx,W2.my); gl.uniform1f(U.glow,W2.glow);
+      gl.uniform4fv(U.rip,W2.rips);
+      gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+      W2.time=tm;
+      requestAnimationFrame(frame);
+    }
+    if (poster.complete && poster.naturalWidth) start(); else poster.addEventListener('load',start,{once:true});
+  })();
+  function ripple(x,y,str){
+    if(!W2.on) return;
+    const i=W2.ri*4; W2.rips[i]=x; W2.rips[i+1]=y; W2.rips[i+2]=W2.time||0; W2.rips[i+3]=str;
+    W2.ri=(W2.ri+1)%10;
+  }
+  addEventListener('pointermove', e=>{
+    W2.mx=e.clientX; W2.my=e.clientY; W2.tglow=1;
+    const now=performance.now(), d=Math.hypot(e.clientX-W2.lx,e.clientY-W2.ly);
+    if (d>46 && now-W2.lt>70){ ripple(e.clientX,e.clientY,Math.min(1,.35+d/160)); W2.lx=e.clientX; W2.ly=e.clientY; W2.lt=now;
+      if (window.__bub) window.__bub(e.clientX,e.clientY,2); }
+  },{passive:true});
+  addEventListener('pointerdown', e=>{ ripple(e.clientX,e.clientY,1.2); if (window.__bub) window.__bub(e.clientX,e.clientY,7); },{passive:true});
+  document.addEventListener('pointerleave', ()=>{ W2.tglow=0; });
+
+  const hudEl = document.getElementById('hud');
+  function onScroll(){
+    hudEl.classList.toggle('scrolled', scrollY > 40);
+    target = progress();
+    if (!raf) raf = requestAnimationFrame(render);
+  }
+  function onResize(){ onScroll(); }
+  addEventListener('scroll', onScroll, {passive:true});
+  addEventListener('resize', onResize);
+  onScroll(); render();
+
+  /* ------ bąbelki ------ */
+  const cv = document.getElementById('bubbles');
+  if (!reduced && cv.getContext){
+    const ctx = cv.getContext('2d');
+    let W, H, parts = [];
+    let sw=0, sh=0;
+    function size(){
+      const w=stage.clientWidth, h=stage.clientHeight; if(!w||!h||(w===sw&&h===sh)) return;
+      sw=w; sh=h; const d=Math.min(devicePixelRatio||1,2);
+      W = cv.width = Math.round(w*d);
+      H = cv.height = Math.round(h*d);
+    }
+    size(); addEventListener('resize', size);
+    const N = Math.min(90, Math.floor(innerWidth/14));
+    for (let i=0;i<N;i++) parts.push(spawn(true));
+    function spawn(anywhere){
+      return {
+        x: Math.random()*1, y: anywhere ? Math.random()*1 : 1.05,
+        r: (Math.random()*2.2+0.6),
+        v: Math.random()*0.0009+0.0004,
+        drift: (Math.random()-0.5)*0.0003,
+        a: Math.random()*0.35+0.1
+      };
+    }
+    const extra = [];   // bąbelki wypuszczane przez kursor
+    window.__bub = (x,y,n) => { for (let k=0;k<n && extra.length<70;k++) extra.push({
+      x:x/sw+(Math.random()-.5)*.012, y:y/sh+(Math.random()-.5)*.012,
+      r:Math.random()*2.4+.9, v:Math.random()*.0022+.0012, drift:(Math.random()-.5)*.0009, a:.55+Math.random()*.3, life:1 }); };
+    let lastP = 0;
+    (function loop(){
+      ctx.clearRect(0,0,W,H);
+      const boost = Math.min(0.004, Math.abs(p-lastP)*2.4); // szybszy scroll = szybsze bąbelki
+      lastP = p;
+      for (let b of parts){
+        b.y -= b.v + boost;
+        b.x += b.drift;
+        // rozstępują się przed kursorem
+        const dx = b.x*sw - W2.mx, dy = b.y*sh - W2.my, dd = dx*dx+dy*dy;
+        if (dd < 14400 && dd > 1){ const f = (1 - Math.sqrt(dd)/120)*.9; b.x += dx/Math.sqrt(dd)*f/sw; b.y += dy/Math.sqrt(dd)*f/sh; }
+        if (b.y < -0.05) Object.assign(b, spawn(false));
+        ctx.beginPath();
+        ctx.arc(b.x*W, b.y*H, b.r*devicePixelRatio, 0, 7);
+        ctx.fillStyle = `rgba(200,235,240,${b.a*(0.35+0.65*(1-p))})`;
+        ctx.fill();
+      }
+      for (let k=extra.length-1;k>=0;k--){
+        const b = extra[k];
+        b.y -= b.v; b.x += b.drift + Math.sin((b.y+k)*40)*.0004; b.life -= .006;
+        if (b.life <= 0 || b.y < -0.05){ extra.splice(k,1); continue; }
+        ctx.beginPath(); ctx.arc(b.x*W, b.y*H, b.r*devicePixelRatio, 0, 7);
+        ctx.strokeStyle = `rgba(210,240,245,${b.a*b.life})`; ctx.lineWidth = devicePixelRatio*.8; ctx.stroke();
+        ctx.fillStyle = `rgba(200,235,240,${b.a*b.life*.25})`; ctx.fill();
+      }
+      requestAnimationFrame(loop);
+    })();
+  }
+
+
+  /* ------ zdjęcia: owinięcie, przechył i powiększenie ------ */
+  (function(){
+    const plates=[...document.querySelectorAll('main figure.plate')];
+    const fine=matchMedia('(pointer:fine)').matches;
+    plates.forEach(f=>{
+      const img=f.querySelector('img'); if(!img) return;
+      f.classList.add('float');
+      const ph=document.createElement('span'); ph.className='ph'; ph.tabIndex=0; ph.setAttribute('role','button');
+      ph.setAttribute('aria-label','Enlarge photo'); img.replaceWith(ph); ph.appendChild(img);
+      if(fine && !reduced){
+        ph.addEventListener('pointermove',e=>{ const r=ph.getBoundingClientRect();
+          const x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5;
+          img.style.transform=`rotateY(${(x*7).toFixed(2)}deg) rotateX(${(-y*7).toFixed(2)}deg) scale(1.045)`; });
+        ph.addEventListener('pointerleave',()=>{ img.style.transform=''; });
+      }
+      const open=()=>openLB(img, (f.querySelector('figcaption b')||{}).textContent||'');
+      ph.addEventListener('click',open);
+      ph.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(); } });
+    });
+
+    const lb=document.getElementById('lb'), big=lb.querySelector('.big'), cap=lb.querySelector('.cap'), xb=lb.querySelector('.x');
+    let src=null, busy=false;
+    function target(img){
+      const vw=innerWidth, vh=innerHeight, iw=img.naturalWidth||img.width, ih=img.naturalHeight||img.height;
+      const s=Math.min(vw*.9/iw, vh*.8/ih); const w=iw*s, h=ih*s;
+      return {x:(vw-w)/2, y:(vh-h)/2-14, w, h};
+    }
+    function fromRect(r,t){ return `translate(${r.left}px,${r.top}px) scale(${r.width/t.w},${r.height/t.h})`; }
+    function openLB(img,text){
+      if(busy) return; busy=true; src=img;
+      img.style.transform='';
+      big.src=img.currentSrc||img.src; big.alt=img.alt; cap.textContent=text;
+      const t=target(img), r=img.getBoundingClientRect();
+      big.style.width=t.w+'px'; big.style.height=t.h+'px';
+      cap.style.top=(t.y+t.h+18)+'px';
+      big.style.transition='none'; big.style.transform=fromRect(r,t);
+      lb.classList.add('open'); src.style.visibility='hidden';
+      document.documentElement.style.overflow='hidden';
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        big.style.transition=''; big.style.transform=`translate(${t.x}px,${t.y}px) scale(1,1)`;
+        lb.classList.add('show'); setTimeout(()=>{busy=false; xb.focus({preventScroll:true});},560);
+      }));
+    }
+    function closeLB(){
+      if(!lb.classList.contains('open')||busy) return; busy=true;
+      const t=target(src), r=src.getBoundingClientRect();
+      lb.classList.remove('show'); lb.classList.add('closing');
+      big.style.transform=fromRect(r,t);
+      setTimeout(()=>{ lb.classList.remove('open','closing'); src.style.visibility=''; document.documentElement.style.overflow='';
+        busy=false; const ph=src.parentElement; ph&&ph.focus({preventScroll:true}); },560);
+    }
+    lb.addEventListener('click',closeLB);
+    addEventListener('keydown',e=>{ if(e.key==='Escape') closeLB(); });
+    addEventListener('resize',()=>{ if(lb.classList.contains('open')&&!busy){ const t=target(src);
+      big.style.width=t.w+'px'; big.style.height=t.h+'px'; big.style.transition='none';
+      big.style.transform=`translate(${t.x}px,${t.y}px)`; cap.style.top=(t.y+t.h+18)+'px'; } });
+  })();
+
+  /* ------ reveal sekcji ------ */
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
+  },{threshold:0.18});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+})();
+</script>
+</body>
+</html>
