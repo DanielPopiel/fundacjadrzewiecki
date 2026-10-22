@@ -12,7 +12,7 @@ PAIRS = [
 ('<title>Fundacja im. Stefana Drzewieckiego — Głębiny, przestworza i kosmos</title>',
  '<title>Stefan Drzewiecki Foundation — The Deep, the Sky and Space</title>'),
 ('content="Fundacja Historii Podboju Głębin, Przestworzy i Kosmosu im. Stefana Drzewieckiego — popularyzacja historycznego dorobku polskiej techniki podwodnej, lotniczej i kosmicznej: ubiory specjalne i urządzenia zapewniające przetrwanie człowieka."',
- 'content="The Stefan Drzewiecki Foundation for the History of the Conquest of the Deep, the Sky and Space — promoting the historical legacy of Polish underwater, aviation and space technology: special garments and equipment that keep people alive."'),
+ 'content="The Stefan Drzewiecki Foundation for the History of the Conquest of the Deep, the Sky and Space — promoting the historical legacy of Polish underwater, aviation and space technology: special purpose garments and equipment that keep people alive."'),
 # --- pasek ---
 ('alt="Godło Fundacji im. Stefana Drzewieckiego"','alt="Emblem of the Stefan Drzewiecki Foundation"'),
 ('<b>Fundacja im. Stefana Drzewieckiego</b>\n        <small>Historia podboju głębin, przestworzy i kosmosu</small>',
@@ -30,17 +30,17 @@ PAIRS = [
       i&nbsp;kosmicznej — ubiory specjalne i&nbsp;urządzenia, dzięki którym człowiek przetrwał
       tam, gdzie natura go nie przewidziała.</p>''',
  '''<p class="lead">We promote the historical legacy of Polish underwater, aviation and space
-      technology — the special garments and equipment that allowed people to survive where
+      technology — the special purpose garments and equipment that allowed people to survive where
       nature never meant them to go.</p>'''),
 # --- fundacja ---
-('<h2>Ubiory specjalne <em>i&nbsp;wyposażenie</em></h2>','<h2>Special garments <em>and equipment</em></h2>'),
+('<h2>Ubiory specjalne <em>i&nbsp;wyposażenie</em></h2>','<h2>Special purpose garments <em>and equipment</em></h2>'),
 ('''<p class="lead">Fundacja im. Stefana Drzewieckiego to inicjatywa mająca na celu popularyzację
           i&nbsp;zwiększanie świadomości społecznej w&nbsp;zakresie historycznego dorobku polskiej techniki
           podwodnej, lotniczej oraz kosmicznej. Głównym obszarem zainteresowań fundacji są ubiory specjalne
           oraz urządzenia zapewniające przetrwanie człowieka w&nbsp;wymienionych wyżej środowiskach.</p>''',
  '''<p class="lead">The Stefan Drzewiecki Foundation is an initiative that aims to promote and raise
           public awareness of the historical achievements of Polish underwater, aviation and space technology.
-          Our main area of interest is special garments and equipment that keep people alive in these
+          Our main area of interest is special purpose garments and equipment that keep people alive in these
           environments.</p>'''),
 ('''<p class="muted">Fundacja historyczna im. Stefana Drzewieckiego to przedsięwzięcie umożliwiające
           w&nbsp;sposób formalny realizować działalność informacyjną oraz edukacyjną w&nbsp;oparciu
