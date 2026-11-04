@@ -547,6 +547,11 @@
 </footer>
 
 <script>
+/* zawsze otwieraj na samej górze: bez przywracania pozycji i bez skoku do #kotwicy z linku */
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+scrollTo(0, 0);
+addEventListener('pageshow', () => scrollTo(0, 0));
 (function(){
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const touch = matchMedia('(pointer:coarse)').matches;   // telefon: tło stoi, bez zoomu przy scrollu
@@ -823,6 +828,11 @@ void main(){
       big.style.width=t.w+'px'; big.style.height=t.h+'px'; big.style.transition='none';
       big.style.transform=`translate(${t.x}px,${t.y}px)`; cap.style.top=(t.y+t.h+18)+'px'; } });
   })();
+
+  document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{
+    const t=document.querySelector(a.getAttribute('href')); if(!t) return;
+    e.preventDefault(); t.scrollIntoView({behavior: reduced?'auto':'smooth', block:'start'});
+  }));
 
   /* ------ reveal sekcji ------ */
   const io = new IntersectionObserver(es=>{
